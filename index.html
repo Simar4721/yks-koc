@@ -370,13 +370,13 @@ window.doLogout=async function(){
 };
 
 window.toggleAuthMode=function(){
-  const isLogin=document.getElementById("authTitle").textContent.includes("Giriş");
-  document.getElementById("authTitle").textContent=isLogin?"Kayıt Ol":"Giriş Yap";
-  document.getElementById("authToggleBtn").textContent=isLogin?"Zaten hesabın var mı? Giriş yap":"Hesabın yok mu? Kayıt ol";
-  document.getElementById("authSubmitBtn").textContent=isLogin?"Kayıt Ol":"Giriş Yap";
-  document.getElementById("authSubmitBtn").onclick=isLogin?doRegister:doLogin;
+  const isRegister=document.getElementById("authTitle").textContent.includes("Kayıt");
+  document.getElementById("authTitle").textContent=isRegister?"Giriş Yap":"Kayıt Ol";
+  document.getElementById("authToggleBtn").textContent=isRegister?"Hesabın yok mu? Kayıt ol":"Zaten hesabın var mı? Giriş yap";
+  document.getElementById("authSubmitBtn").textContent=isRegister?"Giriş Yap":"Kayıt Ol";
+  document.getElementById("authSubmitBtn").onclick=isRegister?window.doLogin:window.doRegister;
   const nameField=document.getElementById("nameField");
-  if(nameField) nameField.style.display=isLogin?"block":"none";
+  if(nameField) nameField.style.display=isRegister?"none":"block";
   document.getElementById("authErr").textContent="";
 };
 

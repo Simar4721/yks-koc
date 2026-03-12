@@ -1,5 +1,5 @@
-
 <!DOCTYPE html>
+
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -7,12 +7,48 @@
 <title>YKSKoç — Takip Paneli</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
 
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#080c14;color:#e8edf5;font-family:'Syne',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(0,212,255,0.04) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 90%,rgba(255,107,53,0.04) 0%,transparent 60%);}
+#root{position:relative;z-index:1;}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes cfFall{to{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:10px;}
+</style>
+
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Reward Overlay -->
+
+<div id="rewardOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);
+  display:flex;align-items:center;justify-content:center;z-index:1000;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;">
+  <div class="rbox" style="background:#0d1421;border:1px solid #ffd60a;
+    border-radius:20px;padding:48px 40px;text-align:center;max-width:400px;width:90%;
+    box-shadow:0 0 60px rgba(255,214,10,0.25);transform:scale(0.8);transition:transform 0.3s;">
+    <div id="rEmoji" style="font-size:3.5rem;margin-bottom:12px;">🎉</div>
+    <div id="rTitle" style="font-size:1.5rem;font-weight:800;color:#ffd60a;margin-bottom:8px;">HARIKA!</div>
+    <div id="rText" style="color:#5a6a7e;font-size:0.95rem;line-height:1.7;margin-bottom:16px;"></div>
+    <div id="rXP" style="font-family:monospace;font-size:1.1rem;color:#2ed573;margin-bottom:20px;"></div>
+    <button id="rewardBtn" style="background:#ffd60a;border:none;color:#000;
+      padding:12px 32px;border-radius:8px;font-weight:800;cursor:pointer;font-size:0.9rem;">
+      DEVAM ET 💪</button>
+  </div>
+</div>
+
 <!-- Firebase -->
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, onSnapshot }
+import { getFirestore, doc, setDoc, getDoc }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -44,120 +80,14 @@ const SUBJECTS = {
 };
 
 const TOPICS = {
-  "tyt-mat":[
-    "Temel Kavramlar & Sayı Basamakları","Bölünebilme Kuralları","Asal Çarpanlara Ayırma",
-    "EBOB & EKOK","Tam Sayılar","Rasyonel Sayılar","Ondalıklı Sayılar","Üslü Sayılar",
-    "Köklü Sayılar","Oran & Orantı","Denklem Çözme","Problemler: Yaş & Karışım",
-    "Problemler: İş & Havuz","Problemler: Hız & Yol","Problemler: Yüzde & Faiz",
-    "Kümeler","Mantık","Fonksiyonlar","Birinci Dereceden Denklemler",
-    "İkinci Dereceden Denklemler","Eşitsizlikler","Mutlak Değer","Polinomlar",
-    "Çarpanlara Ayırma","Denklem Sistemleri","Üçgenler: Temel Özellikler",
-    "Üçgenler: Benzerlik","Özel Üçgenler","Dörtgenler","Çokgenler","Çember & Daire",
-    "Alan & Çevre Problemleri","Katı Cisimler","Veri Analizi & Tablo",
-    "İstatistik: Ortalama, Medyan, Mod","Sayma & Olasılık Temelleri",
-  ],
-  "tyt-fen":[
-    "Fizik: Ölçme & Birimler","Fizik: Madde & Özellikleri","Fizik: Kuvvet & Hareket",
-    "Fizik: Newton Yasaları","Fizik: Enerji & Güç & İş","Fizik: Basınç (Katı, Sıvı, Gaz)",
-    "Fizik: Elektrik Temelleri","Fizik: Manyetizma Temelleri","Fizik: Dalgalar & Ses",
-    "Fizik: Işık & Optik Temelleri","Fizik: Isı & Sıcaklık",
-    "Kimya: Atom & Periyodik Sistem","Kimya: Kimyasal Bağlar","Kimya: Karışımlar & Çözeltiler",
-    "Kimya: Maddenin Halleri","Kimya: Asit & Baz Temelleri","Kimya: Kimyasal Tepkimeler",
-    "Kimya: Günlük Hayatta Kimya",
-    "Biyoloji: Hücre Yapısı","Biyoloji: Canlıların Temel Özellikleri",
-    "Biyoloji: Canlıların Sınıflandırılması","Biyoloji: Fotosentez & Solunum",
-    "Biyoloji: Mitoz","Biyoloji: Kalıtım Temelleri","Biyoloji: Ekosistem & Çevre",
-    "Biyoloji: Sindirim Sistemi","Biyoloji: Dolaşım Sistemi","Biyoloji: Sinir Sistemi Temelleri",
-  ],
-  "tyt-turk":[
-    "Sözcükte Anlam: Gerçek & Mecaz","Sözcükte Anlam: Deyim & Atasözü",
-    "Sözcükte Anlam: Eş & Zıt Anlam","Sözcükte Anlam: Sözcük Türleri",
-    "Cümlede Anlam: Öznel & Nesnel","Cümlede Anlam: Neden-Sonuç, Koşul",
-    "Cümlede Anlam: Cümle Tamamlama","Paragraf: Ana Düşünce",
-    "Paragraf: Yardımcı Düşünce","Paragraf: Başlık & Özet","Paragraf: Boşluk Doldurma",
-    "Paragraf: Anlatım Biçimleri","Dil Bilgisi: Ses Bilgisi","Dil Bilgisi: Yazım Kuralları",
-    "Dil Bilgisi: Noktalama","Dil Bilgisi: Yapım Ekleri","Dil Bilgisi: Çekim Ekleri",
-    "Dil Bilgisi: İsim & Sıfat","Dil Bilgisi: Zamir & Zarf","Dil Bilgisi: Fiil",
-    "Dil Bilgisi: Fiilimsiler","Dil Bilgisi: Cümlenin Ögeleri","Dil Bilgisi: Cümle Türleri",
-    "Anlatım: Söz Sanatları","Anlatım: Anlatım Bozuklukları",
-  ],
-  "tyt-sos":[
-    "Tarih: İlk Türk Devletleri","Tarih: İslamiyet & Türkler",
-    "Tarih: Osmanlı Kuruluş & Yükseliş","Tarih: Osmanlı Duraklama & Gerileme",
-    "Tarih: Reform, Rönesans, Coğrafi Keşifler","Tarih: Fransız Devrimi & Milliyetçilik",
-    "Tarih: Osmanlı Islahat Hareketleri","Tarih: 1. Dünya Savaşı & Kurtuluş Savaşı",
-    "Tarih: Atatürk İlke & İnkılapları","Tarih: 2. Dünya Savaşı & Soğuk Savaş",
-    "Coğrafya: Konum & Yüzey Şekilleri","Coğrafya: İklimler & Bitki Örtüsü",
-    "Coğrafya: Nüfus & Göç","Coğrafya: Ekonomik Faaliyetler","Coğrafya: Harita Bilgisi",
-    "Felsefe: Giriş & Temel Kavramlar","Felsefe: Bilgi Kuramı",
-    "Felsefe: Varlık Felsefesi","Felsefe: Ahlak Felsefesi",
-    "Din Kültürü: İslamın Temel İlkeleri","Din Kültürü: Hz. Muhammed & Siyer",
-    "Din Kültürü: Ahlak & Değerler",
-    "Vatandaşlık: Anayasa & Devlet Yapısı","Vatandaşlık: Temel Hak & Özgürlükler",
-  ],
-  "ayt-mat":[
-    "Fonksiyonlar: Tanım & Özellikleri","Fonksiyonlar: Bileşke & Ters",
-    "Fonksiyonlar: Özel Fonksiyonlar","Trigonometri: Açı & Birim Çember",
-    "Trigonometri: Temel Oranlar & Özdeşlikler","Trigonometri: Toplam & Fark Formülleri",
-    "Trigonometri: Denklemler","Logaritma: Tanım & Özellikleri",
-    "Logaritma: Denklemler & Eşitsizlikler","Diziler: Aritmetik Dizi",
-    "Diziler: Geometrik Dizi","Diziler: Toplam Formülleri",
-    "Limit: Tanım & Temel Limitler","Limit: Belirsiz Şekiller","Süreklilik",
-    "Türev: Tanım & Kurallar","Türev: Zincir Kuralı & Üstel/Log",
-    "Türev: Uygulamalar (Ekstremum)","Türev: Grafik Çizimi",
-    "İntegral: Belirsiz İntegral","İntegral: Belirli İntegral","İntegral: Alan Hesabı",
-    "Analitik Geometri: Doğru","Analitik Geometri: Çember","Konikler: Parabol",
-    "Konikler: Elips & Hiperbol","Permütasyon & Kombinasyon","Olasılık",
-    "Binom Açılımı","İstatistik: Varyans & Standart Sapma","Karmaşık Sayılar","Matrisler & Determinant",
-  ],
-  "ayt-fiz":[
-    "Vektörler & Kuvvet Analizi","Kinematik: Düzgün & İvmeli Hareket",
-    "Kinematik: Serbest Düşme & Atış","Dinamik: Newton Yasaları",
-    "Dinamik: Sürtünme Kuvveti","Dinamik: Bağlı Cisimler",
-    "İş, Enerji & Güç","Momentum & İmpuls","Çarpışmalar",
-    "Dairesel Hareket","Basit Harmonik Hareket","Tork & Denge","Gravitasyon",
-    "Dalgalar: Mekanik","Dalgalar: Ses",
-    "Elektrostatik: Coulomb Yasası","Elektrostatik: Elektrik Alan & Potansiyel",
-    "Elektrostatik: Kondansatörler","Elektrik Akımı: Ohm & Devreler",
-    "Elektrik Akımı: Kirchhoff Yasaları","Manyetik Alan",
-    "Manyetik Kuvvet (Akım & Yük)","Elektromanyetik İndüksiyon",
-    "Transformatörler & Alternatif Akım","Geometrik Optik: Yansıma & Kırılma",
-    "Geometrik Optik: Mercekler & Aynalar","Modern Fizik: Fotoelektrik Olay",
-    "Modern Fizik: Madde Dalgaları","Nükleer Fizik: Radyoaktivite","Nükleer Fizik: Fisyon & Füzyon",
-  ],
-  "ayt-kim":[
-    "Atomun Yapısı & Kuantum Modeli","Periyodik Tablo & Periyodik Özellikler",
-    "Kimyasal Bağlar: İyonik & Kovalent","Kimyasal Bağlar: Metalik & Zayıf Kuvvetler",
-    "Mol Kavramı & Avogadro","Kimyasal Hesaplamalar: Stokiyometri",
-    "Gazlar: İdeal Gaz Yasası","Gazlar: Dalton Yasası",
-    "Sıvı Çözeltiler & Derişim","Termokimya: Entalpi & Hess Yasası",
-    "Kinetik: Tepkime Hızı","Kinetik: Hız Bağıntısı & Arrhenius",
-    "Kimyasal Denge: Le Chatelier","Kimyasal Denge: Kc & Kp",
-    "Asit-Baz: Bronsted-Lowry Teorisi","Asit-Baz: pH & pOH Hesabı",
-    "Asit-Baz: Tampon Çözeltiler","Çözünürlük Dengesi",
-    "Elektrokimya: Galvanik Pil","Elektrokimya: Elektroliz",
-    "Organik: Hidrokarbonlar (Alkan, Alken, Alkin)","Organik: Aromatik Bileşikler",
-    "Organik: Alkoller & Eterler","Organik: Aldehit & Ketonlar",
-    "Organik: Karboksilik Asitler & Esterler","Organik: Aminler & Amitler",
-    "Organik: Reaksiyon Mekanizmaları","Polimer & Biyomoleküller","Nükleer Kimya",
-  ],
-  "ayt-bio":[
-    "Hücre: Yapı & Organeller","Hücre: Madde Geçişi (Pasif & Aktif)",
-    "Hücre: Hücre İskeleti","Biyomoleküller: Karbonhidratlar","Biyomoleküller: Lipidler",
-    "Biyomoleküller: Proteinler & Enzimler","Biyomoleküller: Nükleik Asitler",
-    "Metabolizma: Fotosentez (Işıklı & Karanlık)","Metabolizma: Hücresel Solunum",
-    "Metabolizma: Fermantasyon","Hücre Bölünmesi: Mitoz","Hücre Bölünmesi: Mayoz",
-    "Kalıtım: DNA Replikasyonu","Kalıtım: Transkripsiyon","Kalıtım: Translasyon",
-    "Kalıtım: Mendel Yasaları","Kalıtım: Kan Grupları & Rh Faktörü",
-    "Kalıtım: Bağlı Genler & Seks Bağlı","Kalıtım: Mutasyon & Modifikasyon",
-    "Genetik Mühendisliği & Biyoteknoloji","Sinir Sistemi: Nöron & Sinaps",
-    "Sinir Sistemi: Merkezi & Çevresel","Duyu Organları",
-    "Hormonal Sistem: Bezler & Hormonlar","Hormonal Sistem: Homeostazi",
-    "Dolaşım Sistemi: Kalp & Kan Damarları","Dolaşım Sistemi: Kan & Lenf",
-    "Bağışıklık Sistemi","Solunum Sistemi","Sindirim Sistemi",
-    "Boşaltım Sistemi","Üreme Sistemi & Gelişme","Hareket Sistemi (Kas & İskelet)",
-    "Populasyon Ekolojisi","Ekosistem: Madde & Enerji Döngüleri","Evrim: Doğal Seleksiyon",
-  ],
+  "tyt-mat":["Temel Kavramlar & Sayı Basamakları","Bölünebilme Kuralları","Asal Çarpanlara Ayırma","EBOB & EKOK","Tam Sayılar","Rasyonel Sayılar","Ondalıklı Sayılar","Üslü Sayılar","Köklü Sayılar","Oran & Orantı","Denklem Çözme","Problemler: Yaş & Karışım","Problemler: İş & Havuz","Problemler: Hız & Yol","Problemler: Yüzde & Faiz","Kümeler","Mantık","Fonksiyonlar","Birinci Dereceden Denklemler","İkinci Dereceden Denklemler","Eşitsizlikler","Mutlak Değer","Polinomlar","Çarpanlara Ayırma","Denklem Sistemleri","Üçgenler: Temel Özellikler","Üçgenler: Benzerlik","Özel Üçgenler","Dörtgenler","Çokgenler","Çember & Daire","Alan & Çevre Problemleri","Katı Cisimler","Veri Analizi & Tablo","İstatistik: Ortalama, Medyan, Mod","Sayma & Olasılık Temelleri"],
+  "tyt-fen":["Fizik: Ölçme & Birimler","Fizik: Madde & Özellikleri","Fizik: Kuvvet & Hareket","Fizik: Newton Yasaları","Fizik: Enerji & Güç & İş","Fizik: Basınç (Katı, Sıvı, Gaz)","Fizik: Elektrik Temelleri","Fizik: Manyetizma Temelleri","Fizik: Dalgalar & Ses","Fizik: Işık & Optik Temelleri","Fizik: Isı & Sıcaklık","Kimya: Atom & Periyodik Sistem","Kimya: Kimyasal Bağlar","Kimya: Karışımlar & Çözeltiler","Kimya: Maddenin Halleri","Kimya: Asit & Baz Temelleri","Kimya: Kimyasal Tepkimeler","Kimya: Günlük Hayatta Kimya","Biyoloji: Hücre Yapısı","Biyoloji: Canlıların Temel Özellikleri","Biyoloji: Canlıların Sınıflandırılması","Biyoloji: Fotosentez & Solunum","Biyoloji: Mitoz","Biyoloji: Kalıtım Temelleri","Biyoloji: Ekosistem & Çevre","Biyoloji: Sindirim Sistemi","Biyoloji: Dolaşım Sistemi","Biyoloji: Sinir Sistemi Temelleri"],
+  "tyt-turk":["Sözcükte Anlam: Gerçek & Mecaz","Sözcükte Anlam: Deyim & Atasözü","Sözcükte Anlam: Eş & Zıt Anlam","Sözcükte Anlam: Sözcük Türleri","Cümlede Anlam: Öznel & Nesnel","Cümlede Anlam: Neden-Sonuç, Koşul","Cümlede Anlam: Cümle Tamamlama","Paragraf: Ana Düşünce","Paragraf: Yardımcı Düşünce","Paragraf: Başlık & Özet","Paragraf: Boşluk Doldurma","Paragraf: Anlatım Biçimleri","Dil Bilgisi: Ses Bilgisi","Dil Bilgisi: Yazım Kuralları","Dil Bilgisi: Noktalama","Dil Bilgisi: Yapım Ekleri","Dil Bilgisi: Çekim Ekleri","Dil Bilgisi: İsim & Sıfat","Dil Bilgisi: Zamir & Zarf","Dil Bilgisi: Fiil","Dil Bilgisi: Fiilimsiler","Dil Bilgisi: Cümlenin Ögeleri","Dil Bilgisi: Cümle Türleri","Anlatım: Söz Sanatları","Anlatım: Anlatım Bozuklukları"],
+  "tyt-sos":["Tarih: İlk Türk Devletleri","Tarih: İslamiyet & Türkler","Tarih: Osmanlı Kuruluş & Yükseliş","Tarih: Osmanlı Duraklama & Gerileme","Tarih: Reform, Rönesans, Coğrafi Keşifler","Tarih: Fransız Devrimi & Milliyetçilik","Tarih: Osmanlı Islahat Hareketleri","Tarih: 1. Dünya Savaşı & Kurtuluş Savaşı","Tarih: Atatürk İlke & İnkılapları","Tarih: 2. Dünya Savaşı & Soğuk Savaş","Coğrafya: Konum & Yüzey Şekilleri","Coğrafya: İklimler & Bitki Örtüsü","Coğrafya: Nüfus & Göç","Coğrafya: Ekonomik Faaliyetler","Coğrafya: Harita Bilgisi","Felsefe: Giriş & Temel Kavramlar","Felsefe: Bilgi Kuramı","Felsefe: Varlık Felsefesi","Felsefe: Ahlak Felsefesi","Din Kültürü: İslamın Temel İlkeleri","Din Kültürü: Hz. Muhammed & Siyer","Din Kültürü: Ahlak & Değerler","Vatandaşlık: Anayasa & Devlet Yapısı","Vatandaşlık: Temel Hak & Özgürlükler"],
+  "ayt-mat":["Fonksiyonlar: Tanım & Özellikleri","Fonksiyonlar: Bileşke & Ters","Fonksiyonlar: Özel Fonksiyonlar","Trigonometri: Açı & Birim Çember","Trigonometri: Temel Oranlar & Özdeşlikler","Trigonometri: Toplam & Fark Formülleri","Trigonometri: Denklemler","Logaritma: Tanım & Özellikleri","Logaritma: Denklemler & Eşitsizlikler","Diziler: Aritmetik Dizi","Diziler: Geometrik Dizi","Diziler: Toplam Formülleri","Limit: Tanım & Temel Limitler","Limit: Belirsiz Şekiller","Süreklilik","Türev: Tanım & Kurallar","Türev: Zincir Kuralı & Üstel/Log","Türev: Uygulamalar (Ekstremum)","Türev: Grafik Çizimi","İntegral: Belirsiz İntegral","İntegral: Belirli İntegral","İntegral: Alan Hesabı","Analitik Geometri: Doğru","Analitik Geometri: Çember","Konikler: Parabol","Konikler: Elips & Hiperbol","Permütasyon & Kombinasyon","Olasılık","Binom Açılımı","İstatistik: Varyans & Standart Sapma","Karmaşık Sayılar","Matrisler & Determinant"],
+  "ayt-fiz":["Vektörler & Kuvvet Analizi","Kinematik: Düzgün & İvmeli Hareket","Kinematik: Serbest Düşme & Atış","Dinamik: Newton Yasaları","Dinamik: Sürtünme Kuvveti","Dinamik: Bağlı Cisimler","İş, Enerji & Güç","Momentum & İmpuls","Çarpışmalar","Dairesel Hareket","Basit Harmonik Hareket","Tork & Denge","Gravitasyon","Dalgalar: Mekanik","Dalgalar: Ses","Elektrostatik: Coulomb Yasası","Elektrostatik: Elektrik Alan & Potansiyel","Elektrostatik: Kondansatörler","Elektrik Akımı: Ohm & Devreler","Elektrik Akımı: Kirchhoff Yasaları","Manyetik Alan","Manyetik Kuvvet (Akım & Yük)","Elektromanyetik İndüksiyon","Transformatörler & Alternatif Akım","Geometrik Optik: Yansıma & Kırılma","Geometrik Optik: Mercekler & Aynalar","Modern Fizik: Fotoelektrik Olay","Modern Fizik: Madde Dalgaları","Nükleer Fizik: Radyoaktivite","Nükleer Fizik: Fisyon & Füzyon"],
+  "ayt-kim":["Atomun Yapısı & Kuantum Modeli","Periyodik Tablo & Periyodik Özellikler","Kimyasal Bağlar: İyonik & Kovalent","Kimyasal Bağlar: Metalik & Zayıf Kuvvetler","Mol Kavramı & Avogadro","Kimyasal Hesaplamalar: Stokiyometri","Gazlar: İdeal Gaz Yasası","Gazlar: Dalton Yasası","Sıvı Çözeltiler & Derişim","Termokimya: Entalpi & Hess Yasası","Kinetik: Tepkime Hızı","Kinetik: Hız Bağıntısı & Arrhenius","Kimyasal Denge: Le Chatelier","Kimyasal Denge: Kc & Kp","Asit-Baz: Bronsted-Lowry Teorisi","Asit-Baz: pH & pOH Hesabı","Asit-Baz: Tampon Çözeltiler","Çözünürlük Dengesi","Elektrokimya: Galvanik Pil","Elektrokimya: Elektroliz","Organik: Hidrokarbonlar (Alkan, Alken, Alkin)","Organik: Aromatik Bileşikler","Organik: Alkoller & Eterler","Organik: Aldehit & Ketonlar","Organik: Karboksilik Asitler & Esterler","Organik: Aminler & Amitler","Organik: Reaksiyon Mekanizmaları","Polimer & Biyomoleküller","Nükleer Kimya"],
+  "ayt-bio":["Hücre: Yapı & Organeller","Hücre: Madde Geçişi (Pasif & Aktif)","Hücre: Hücre İskeleti","Biyomoleküller: Karbonhidratlar","Biyomoleküller: Lipidler","Biyomoleküller: Proteinler & Enzimler","Biyomoleküller: Nükleik Asitler","Metabolizma: Fotosentez (Işıklı & Karanlık)","Metabolizma: Hücresel Solunum","Metabolizma: Fermantasyon","Hücre Bölünmesi: Mitoz","Hücre Bölünmesi: Mayoz","Kalıtım: DNA Replikasyonu","Kalıtım: Transkripsiyon","Kalıtım: Translasyon","Kalıtım: Mendel Yasaları","Kalıtım: Kan Grupları & Rh Faktörü","Kalıtım: Bağlı Genler & Seks Bağlı","Kalıtım: Mutasyon & Modifikasyon","Genetik Mühendisliği & Biyoteknoloji","Sinir Sistemi: Nöron & Sinaps","Sinir Sistemi: Merkezi & Çevresel","Duyu Organları","Hormonal Sistem: Bezler & Hormonlar","Hormonal Sistem: Homeostazi","Dolaşım Sistemi: Kalp & Kan Damarları","Dolaşım Sistemi: Kan & Lenf","Bağışıklık Sistemi","Solunum Sistemi","Sindirim Sistemi","Boşaltım Sistemi","Üreme Sistemi & Gelişme","Hareket Sistemi (Kas & İskelet)","Populasyon Ekolojisi","Ekosistem: Madde & Enerji Döngüleri","Evrim: Doğal Seleksiyon"],
 };
 
 const LEVELS=[
@@ -183,7 +113,7 @@ let userData = { done:{}, xp:0, streak:[], name:"" };
 let activePage = "auth";
 let activeSub = "tyt-mat";
 let saveTimeout = null;
-let unsubSnapshot = null;
+let authMode = "register";
 
 // ── HELPERS ──────────────────────────────────────────────────
 function daysTo(d){ return Math.max(0, Math.ceil((d - Date.now()) / 86400000)); }
@@ -270,11 +200,12 @@ function showReward(emoji,title,text,xpAmt){
   el.querySelector(".rbox").style.transform="scale(1)";
   launchConfetti();
 }
-window.closeReward=function(){
+
+function closeReward(){
   const el=document.getElementById("rewardOverlay");
   el.style.opacity="0"; el.style.pointerEvents="none";
   el.querySelector(".rbox").style.transform="scale(0.8)";
-};
+}
 
 // ── LOADING ───────────────────────────────────────────────────
 function showLoading(msg){
@@ -286,7 +217,7 @@ function showLoading(msg){
 }
 
 // ── TOGGLE TOPIC ─────────────────────────────────────────────
-window.toggleTopic=function(subj,i){
+function toggleTopic(subj,i){
   const key=subj+":"+i;
   const wasDone=!!userData.done[key];
   const xpAmt=SUBJECTS[subj].xp;
@@ -312,14 +243,14 @@ window.toggleTopic=function(subj,i){
   scheduleSave();
   renderTopics();
   renderStats();
-};
+}
 
-window.setPage=function(p){
+function setPage(p){
   activePage=p;
   render();
-};
+}
 
-window.setSubject=function(s){
+function setSubject(s){
   activeSub=s;
   renderTopics();
   document.querySelectorAll(".subTab").forEach(b=>{
@@ -328,17 +259,18 @@ window.setSubject=function(s){
     b.style.color=b.dataset.s===s?"#000":"#5a6a7e";
     b.style.fontWeight=b.dataset.s===s?"700":"400";
   });
-};
+}
 
 // ── AUTH HANDLERS ────────────────────────────────────────────
-window.doRegister=async function(){
-  const name=document.getElementById("authName")?.value.trim();
+async function doRegister(){
+  const nameEl=document.getElementById("authName");
+  const name=nameEl?nameEl.value.trim():"";
   const email=document.getElementById("authEmail").value.trim();
   const pass=document.getElementById("authPass").value;
   const err=document.getElementById("authErr");
   if(!name||!email||!pass){ err.textContent="Tüm alanları doldur!"; return; }
   if(pass.length<6){ err.textContent="Şifre en az 6 karakter olmalı!"; return; }
-  err.textContent="";
+  err.textContent="Kayıt yapılıyor...";
   try{
     const cred=await createUserWithEmailAndPassword(auth,email,pass);
     await updateProfile(cred.user,{displayName:name});
@@ -349,30 +281,29 @@ window.doRegister=async function(){
     else if(e.code==="auth/invalid-email") err.textContent="Geçersiz e-posta adresi!";
     else err.textContent="Hata: "+e.message;
   }
-};
+}
 
-window.doLogin=async function(){
+async function doLogin(){
   const email=document.getElementById("authEmail").value.trim();
   const pass=document.getElementById("authPass").value;
   const err=document.getElementById("authErr");
-  err.textContent="";
+  err.textContent="Giriş yapılıyor...";
   try{
     await signInWithEmailAndPassword(auth,email,pass);
   } catch(e){
     if(e.code==="auth/invalid-credential"||e.code==="auth/wrong-password") err.textContent="E-posta veya şifre hatalı!";
     else if(e.code==="auth/user-not-found") err.textContent="Bu e-posta ile kayıtlı kullanıcı yok!";
+    else if(e.code==="auth/invalid-email") err.textContent="Geçersiz e-posta adresi!";
     else err.textContent="Hata: "+e.message;
   }
-};
+}
 
-window.doLogout=async function(){
+async function doLogout(){
   await signOut(auth);
-};
-
-
+}
 
 // ── SEND TO COACH ────────────────────────────────────────────
-window.sendToCoach=async function(){
+async function sendToCoach(){
   const inp=document.getElementById("coachInp");
   const msg=inp.value.trim();
   if(!msg) return;
@@ -401,9 +332,7 @@ Kısa, samimi, motive edici cevaplar ver. Türkçe. Emoji kullan. Maks 4-5 cüml
     loadEl.remove();
     appendChat("Bağlantı hatası, lütfen tekrar dene.","coach");
   }
-};
-
-window.coachKeydown=function(e){ if(e.key==="Enter") sendToCoach(); };
+}
 
 function appendChat(text,role,temp=false){
   const box=document.getElementById("chatHistory");
@@ -425,19 +354,18 @@ function renderStats(){
   const {lvl,idx,next,pct}=getLevel(userData.xp);
   const tytPct=s.tT?Math.round(s.tD/s.tT*100):0;
   const aytPct=s.aT?Math.round(s.aD/s.aT*100):0;
-  el("sTotalDone",s.total);
-  el("sTotalLeft",s.all-s.total);
-  el("sXP",userData.xp);
-  el("sStreak",countStreak(userData.streak)+" 🔥");
-  el("sLevelBadge","LVL "+(idx+1));
-  el("sLevelName",lvl.name);
-  el("sXPLabel",userData.xp+" / "+next.min+" XP");
-  bar("xpBar",pct,"linear-gradient(90deg,#ffd60a,#ff6b35)");
-  bar("tytBar",tytPct,"#00d4ff");
-  bar("aytBar",aytPct,"#ff6b35");
-  pctEl("tytPct",tytPct);
-  pctEl("aytPct",aytPct);
-  // streak days
+  elSet("sTotalDone",s.total);
+  elSet("sTotalLeft",s.all-s.total);
+  elSet("sXP",userData.xp);
+  elSet("sStreak",countStreak(userData.streak)+" 🔥");
+  elSet("sLevelBadge","LVL "+(idx+1));
+  elSet("sLevelName",lvl.name);
+  elSet("sXPLabel",userData.xp+" / "+next.min+" XP");
+  barSet("xpBar",pct,"linear-gradient(90deg,#ffd60a,#ff6b35)");
+  barSet("tytBar",tytPct,"#00d4ff");
+  barSet("aytBar",aytPct,"#ff6b35");
+  pctSet("tytPct",tytPct);
+  pctSet("aytPct",aytPct);
   const streakRow=document.getElementById("streakRow");
   if(streakRow){
     streakRow.innerHTML="";
@@ -458,9 +386,9 @@ function renderStats(){
   }
 }
 
-function el(id,val){ const e=document.getElementById(id); if(e) e.textContent=val; }
-function bar(id,w,clr){ const e=document.getElementById(id); if(e){e.style.width=w+"%";e.style.background=clr;} }
-function pctEl(id,v){ const e=document.getElementById(id); if(e) e.textContent=v+"%"; }
+function elSet(id,val){ const e=document.getElementById(id); if(e) e.textContent=val; }
+function barSet(id,w,clr){ const e=document.getElementById(id); if(e){e.style.width=w+"%";e.style.background=clr;} }
+function pctSet(id,v){ const e=document.getElementById(id); if(e) e.textContent=v+"%"; }
 
 // ── RENDER TOPICS ────────────────────────────────────────────
 function renderTopics(){
@@ -476,7 +404,7 @@ function renderTopics(){
       background:${isDone?"rgba(46,213,115,0.08)":"rgba(255,255,255,0.03)"};
       border:1px solid ${isDone?"rgba(46,213,115,0.3)":"rgba(255,255,255,0.07)"};
       border-radius:8px;padding:11px 13px;cursor:pointer;transition:all 0.2s;`;
-    d.onclick=()=>toggleTopic(activeSub,i);
+    d.addEventListener("click",()=>toggleTopic(activeSub,i));
     d.innerHTML=`
       <div style="width:22px;height:22px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;
         justify-content:center;font-size:0.8rem;
@@ -493,36 +421,48 @@ function renderTopics(){
   });
 }
 
-// ── MAIN RENDER ───────────────────────────────────────────────
-function render(){
-  if(activePage==="auth"){ renderAuth("register"); return; }
-  if(activePage==="dashboard"){ renderDashboard(); return; }
-  if(activePage==="topics"){ renderTopicsPage(); return; }
-  if(activePage==="coach"){ renderCoachPage(); return; }
-}
-
+// ── NAV HTML ──────────────────────────────────────────────────
 function navHTML(active){
   return `<header style="display:flex;align-items:center;justify-content:space-between;
     padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:28px;flex-wrap:wrap;gap:12px;">
     <div style="font-size:1.4rem;font-weight:800;">YKS<span style="color:#00d4ff;">Koç</span>
       <span style="font-size:0.75rem;color:#5a6a7e;margin-left:10px;font-family:monospace;">
         ${currentUser?.displayName||currentUser?.email||""}</span></div>
-    <nav style="display:flex;gap:6px;flex-wrap:wrap;">
-      ${["dashboard","topics","coach"].map(p=>`
-        <button onclick="setPage('${p}')" style="background:${active===p?"rgba(0,212,255,0.1)":"transparent"};
-          border:1px solid ${active===p?"#00d4ff":"rgba(255,255,255,0.07)"};
-          color:${active===p?"#00d4ff":"#5a6a7e"};padding:8px 18px;border-radius:6px;
-          font-family:monospace;font-size:0.72rem;cursor:pointer;letter-spacing:1px;">
-          ${p==="dashboard"?"📊 Panel":p==="topics"?"📚 Konular":"🤖 Koç"}</button>`).join("")}
-      <button onclick="doLogout()" style="background:transparent;border:1px solid rgba(255,100,100,0.3);
-        color:#ff4757;padding:8px 14px;border-radius:6px;font-family:monospace;font-size:0.72rem;cursor:pointer;">
-        Çıkış</button>
-    </nav>
+    <nav style="display:flex;gap:6px;flex-wrap:wrap;" id="mainNav"></nav>
   </header>`;
 }
 
-function renderAuth(mode){
-  const isLogin = mode==="login";
+function attachNav(active){
+  const nav=document.getElementById("mainNav");
+  if(!nav) return;
+  [["dashboard","📊 Panel"],["topics","📚 Konular"],["coach","🤖 Koç"]].forEach(([p,label])=>{
+    const btn=document.createElement("button");
+    btn.style.cssText=`background:${active===p?"rgba(0,212,255,0.1)":"transparent"};
+      border:1px solid ${active===p?"#00d4ff":"rgba(255,255,255,0.07)"};
+      color:${active===p?"#00d4ff":"#5a6a7e"};padding:8px 18px;border-radius:6px;
+      font-family:monospace;font-size:0.72rem;cursor:pointer;letter-spacing:1px;`;
+    btn.textContent=label;
+    btn.addEventListener("click",()=>setPage(p));
+    nav.appendChild(btn);
+  });
+  const logoutBtn=document.createElement("button");
+  logoutBtn.style.cssText=`background:transparent;border:1px solid rgba(255,100,100,0.3);
+    color:#ff4757;padding:8px 14px;border-radius:6px;font-family:monospace;font-size:0.72rem;cursor:pointer;`;
+  logoutBtn.textContent="Çıkış";
+  logoutBtn.addEventListener("click",doLogout);
+  nav.appendChild(logoutBtn);
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────
+function render(){
+  if(activePage==="auth"){ renderAuth(); return; }
+  if(activePage==="dashboard"){ renderDashboard(); return; }
+  if(activePage==="topics"){ renderTopicsPage(); return; }
+  if(activePage==="coach"){ renderCoachPage(); return; }
+}
+
+function renderAuth(){
+  const isLogin = authMode==="login";
   document.getElementById("root").innerHTML=`
   <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
     <div style="background:#0d1421;border:1px solid rgba(255,255,255,0.07);border-radius:16px;
@@ -546,22 +486,31 @@ function renderAuth(mode){
       </div>
       <div style="margin-bottom:20px;">
         <input id="authPass" type="password" placeholder="Şifre (en az 6 karakter)"
-          onkeydown="if(event.key==='Enter')${isLogin?'doLogin()':'doRegister()'}"
           style="width:100%;background:rgba(255,255,255,0.05);
           border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 15px;
           color:#e8edf5;font-size:0.9rem;outline:none;font-family:inherit;box-sizing:border-box;">
       </div>
       <div id="authErr" style="color:#ff4757;font-size:0.85rem;margin-bottom:12px;min-height:20px;"></div>
-      <button onclick="${isLogin?'doLogin()':'doRegister()'}" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0098cc);
+      <button id="authMainBtn" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0098cc);
         border:none;color:#000;padding:13px;border-radius:8px;font-weight:800;font-size:1rem;cursor:pointer;">
         ${isLogin?"Giriş Yap":"Kayıt Ol"}</button>
-      <button onclick="renderAuth('${isLogin?'register':'login'}')" style="width:100%;margin-top:12px;background:transparent;
+      <button id="authToggleBtn" style="width:100%;margin-top:12px;background:transparent;
         border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#5a6a7e;font-size:0.85rem;cursor:pointer;padding:10px;">
         ${isLogin?"Hesabın yok mu? Kayıt ol":"Zaten hesabın var mı? Giriş yap"}</button>
       <p style="text-align:center;color:#5a6a7e;font-size:0.75rem;margin-top:16px;line-height:1.5;">
         🔒 Verilen bilgiler sadece YKS takibinde kullanılır.</p>
     </div>
   </div>`;
+
+  // Attach event listeners (no inline onclick needed)
+  document.getElementById("authMainBtn").addEventListener("click", isLogin ? doLogin : doRegister);
+  document.getElementById("authToggleBtn").addEventListener("click", ()=>{
+    authMode = isLogin ? "register" : "login";
+    renderAuth();
+  });
+  document.getElementById("authPass").addEventListener("keydown", e=>{
+    if(e.key==="Enter") isLogin ? doLogin() : doRegister();
+  });
 }
 
 function renderDashboard(){
@@ -637,22 +586,8 @@ function renderDashboard(){
         ${motivation}</div>
     </div>
   </div>`;
-  // render streak days
-  const streakRow=document.getElementById("streakRow");
-  for(let i=0;i<7;i++){
-    const d=new Date(); d.setDate(d.getDate()-6+i);
-    const ds=d.toDateString();
-    const isDone=userData.streak.includes(ds);
-    const isToday=ds===todayStr();
-    const div=document.createElement("div");
-    div.style.cssText=`width:28px;height:28px;border-radius:6px;display:flex;align-items:center;
-      justify-content:center;font-family:monospace;font-size:0.6rem;
-      background:${isDone?"#2ed573":"transparent"};
-      border:1px solid ${isDone?"#2ed573":isToday?"#00d4ff":"rgba(255,255,255,0.07)"};
-      color:${isDone?"#000":isToday?"#00d4ff":"#5a6a7e"};`;
-    div.textContent=d.getDate();
-    streakRow.appendChild(div);
-  }
+  attachNav("dashboard");
+  renderStats();
 }
 
 function renderTopicsPage(){
@@ -662,21 +597,26 @@ function renderTopicsPage(){
     <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;margin-bottom:16px;font-family:monospace;">
       📚 KONU ÇİZELGESİ — <span style="color:#00d4ff;">BİTİRDİĞİNDE TIKla</span>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
-      ${Object.entries(SUBJECTS).map(([key,sub])=>`
-        <button class="subTab" data-s="${key}" onclick="setSubject('${key}')"
-          style="padding:8px 16px;border-radius:8px;font-family:monospace;font-size:0.7rem;letter-spacing:1px;
-          cursor:pointer;transition:all 0.2s;
-          background:${activeSub===key?sub.color:"transparent"};
-          border:1px solid ${activeSub===key?sub.color:"rgba(255,255,255,0.07)"};
-          color:${activeSub===key?"#000":"#5a6a7e"};font-weight:${activeSub===key?700:400};">
-          ${sub.label}
-          <span style="opacity:0.7;font-size:0.6rem;margin-left:5px;">
-            (${TOPICS[key].filter((_,i)=>userData.done[key+":"+i]).length}/${TOPICS[key].length})</span>
-        </button>`).join("")}
-    </div>
+    <div id="subjectTabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;"></div>
     <div id="topicList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;"></div>
   </div>`;
+  attachNav("topics");
+  // Build subject tabs with event listeners
+  const tabsContainer=document.getElementById("subjectTabs");
+  Object.entries(SUBJECTS).forEach(([key,sub])=>{
+    const btn=document.createElement("button");
+    btn.className="subTab";
+    btn.dataset.s=key;
+    const doneCount=TOPICS[key].filter((_,i)=>userData.done[key+":"+i]).length;
+    btn.style.cssText=`padding:8px 16px;border-radius:8px;font-family:monospace;font-size:0.7rem;letter-spacing:1px;
+      cursor:pointer;transition:all 0.2s;
+      background:${activeSub===key?sub.color:"transparent"};
+      border:1px solid ${activeSub===key?sub.color:"rgba(255,255,255,0.07)"};
+      color:${activeSub===key?"#000":"#5a6a7e"};font-weight:${activeSub===key?700:400};`;
+    btn.innerHTML=`${sub.label} <span style="opacity:0.7;font-size:0.6rem;margin-left:5px;">(${doneCount}/${TOPICS[key].length})</span>`;
+    btn.addEventListener("click",()=>setSubject(key));
+    tabsContainer.appendChild(btn);
+  });
   renderTopics();
 }
 
@@ -694,18 +634,26 @@ function renderCoachPage(){
       <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;">
         <div id="chatHistory" style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;"></div>
         <div style="display:flex;gap:10px;">
-          <input id="coachInp" onkeydown="coachKeydown(event)" placeholder="Koçuna bir şey sor..."
+          <input id="coachInp" placeholder="Koçuna bir şey sor..."
             style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);
             border-radius:8px;padding:11px 15px;color:#e8edf5;font-size:0.9rem;outline:none;font-family:inherit;">
-          <button onclick="sendToCoach()" style="background:#00d4ff;border:none;color:#000;
+          <button id="coachSendBtn" style="background:#00d4ff;border:none;color:#000;
             padding:11px 20px;border-radius:8px;cursor:pointer;font-weight:800;font-size:1rem;">→</button>
         </div>
       </div>
     </div>
   </div>`;
+  attachNav("coach");
+  document.getElementById("coachSendBtn").addEventListener("click", sendToCoach);
+  document.getElementById("coachInp").addEventListener("keydown", e=>{ if(e.key==="Enter") sendToCoach(); });
   const stats=calcStats();
   appendChat(`Merhaba ${userData.name||""}! 👋 TYT'ye ${daysTo(TYT_DATE)} günün var. Şu ana kadar ${stats.total} konu bitirmişsin — devam et! Ne sormak istiyorsun? 💪`,"coach");
 }
+
+// ── REWARD BUTTON ─────────────────────────────────────────────
+document.getElementById("rewardBtn").addEventListener("click", closeReward);
+document.getElementById("rewardOverlay").addEventListener("click", closeReward);
+document.querySelector(".rbox").addEventListener("click", e=>e.stopPropagation());
 
 // ── INIT ──────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded",()=>{
@@ -713,36 +661,5 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 </script>
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:#080c14;color:#e8edf5;font-family:'Syne',sans-serif;min-height:100vh;}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(0,212,255,0.04) 0%,transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 90%,rgba(255,107,53,0.04) 0%,transparent 60%);}
-#root{position:relative;z-index:1;}
-@keyframes spin{to{transform:rotate(360deg)}}
-::-webkit-scrollbar{width:5px;}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:10px;}
-</style>
-</head>
-<body>
-<div id="root"></div>
-
-<!-- Reward Overlay -->
-<div id="rewardOverlay" onclick="closeReward()" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);
-  display:flex;align-items:center;justify-content:center;z-index:1000;
-  opacity:0;pointer-events:none;transition:opacity 0.3s;">
-  <div class="rbox" onclick="event.stopPropagation()" style="background:#0d1421;border:1px solid #ffd60a;
-    border-radius:20px;padding:48px 40px;text-align:center;max-width:400px;width:90%;
-    box-shadow:0 0 60px rgba(255,214,10,0.25);transform:scale(0.8);transition:transform 0.3s;">
-    <div id="rEmoji" style="font-size:3.5rem;margin-bottom:12px;">🎉</div>
-    <div id="rTitle" style="font-size:1.5rem;font-weight:800;color:#ffd60a;margin-bottom:8px;">HARIKA!</div>
-    <div id="rText" style="color:#5a6a7e;font-size:0.95rem;line-height:1.7;margin-bottom:16px;"></div>
-    <div id="rXP" style="font-family:monospace;font-size:1.1rem;color:#2ed573;margin-bottom:20px;"></div>
-    <button onclick="closeReward()" style="background:#ffd60a;border:none;color:#000;
-      padding:12px 32px;border-radius:8px;font-weight:800;cursor:pointer;font-size:0.9rem;">
-      DEVAM ET 💪</button>
-  </div>
-</div>
 </body>
 </html>

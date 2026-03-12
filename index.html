@@ -369,16 +369,7 @@ window.doLogout=async function(){
   await signOut(auth);
 };
 
-window.toggleAuthMode=function(){
-  const isRegister=document.getElementById("authTitle").textContent.includes("Kayıt");
-  document.getElementById("authTitle").textContent=isRegister?"Giriş Yap":"Kayıt Ol";
-  document.getElementById("authToggleBtn").textContent=isRegister?"Hesabın yok mu? Kayıt ol":"Zaten hesabın var mı? Giriş yap";
-  document.getElementById("authSubmitBtn").textContent=isRegister?"Giriş Yap":"Kayıt Ol";
-  document.getElementById("authSubmitBtn").onclick=isRegister?window.doLogin:window.doRegister;
-  const nameField=document.getElementById("nameField");
-  if(nameField) nameField.style.display=isRegister?"none":"block";
-  document.getElementById("authErr").textContent="";
-};
+
 
 // ── SEND TO COACH ────────────────────────────────────────────
 window.sendToCoach=async function(){
@@ -504,7 +495,7 @@ function renderTopics(){
 
 // ── MAIN RENDER ───────────────────────────────────────────────
 function render(){
-  if(activePage==="auth"){ renderAuth(); return; }
+  if(activePage==="auth"){ renderAuth("register"); return; }
   if(activePage==="dashboard"){ renderDashboard(); return; }
   if(activePage==="topics"){ renderTopicsPage(); return; }
   if(activePage==="coach"){ renderCoachPage(); return; }
@@ -530,7 +521,8 @@ function navHTML(active){
   </header>`;
 }
 
-function renderAuth(){
+function renderAuth(mode){
+  const isLogin = mode==="login";
   document.getElementById("root").innerHTML=`
   <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
     <div style="background:#0d1421;border:1px solid rgba(255,255,255,0.07);border-radius:16px;
@@ -542,11 +534,11 @@ function renderAuth(){
         <div style="font-family:monospace;font-size:0.7rem;letter-spacing:3px;color:#5a6a7e;margin-top:6px;">
           YAZILIM MÜHENDİSLİĞİ YOLCULUĞU</div>
       </div>
-      <div id="nameField" style="margin-bottom:12px;">
+      ${!isLogin?`<div style="margin-bottom:12px;">
         <input id="authName" placeholder="Adın Soyadın" style="width:100%;background:rgba(255,255,255,0.05);
           border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 15px;
           color:#e8edf5;font-size:0.9rem;outline:none;font-family:inherit;box-sizing:border-box;">
-      </div>
+      </div>`:""}
       <div style="margin-bottom:12px;">
         <input id="authEmail" type="email" placeholder="E-posta adresi" style="width:100%;background:rgba(255,255,255,0.05);
           border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 15px;
@@ -554,18 +546,18 @@ function renderAuth(){
       </div>
       <div style="margin-bottom:20px;">
         <input id="authPass" type="password" placeholder="Şifre (en az 6 karakter)"
-          onkeydown="if(event.key==='Enter')doRegister()"
+          onkeydown="if(event.key==='Enter')${isLogin?'doLogin()':'doRegister()'}"
           style="width:100%;background:rgba(255,255,255,0.05);
           border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 15px;
           color:#e8edf5;font-size:0.9rem;outline:none;font-family:inherit;box-sizing:border-box;">
       </div>
       <div id="authErr" style="color:#ff4757;font-size:0.85rem;margin-bottom:12px;min-height:20px;"></div>
-      <button id="authSubmitBtn" onclick="doRegister()" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0098cc);
+      <button onclick="${isLogin?'doLogin()':'doRegister()'}" style="width:100%;background:linear-gradient(135deg,#00d4ff,#0098cc);
         border:none;color:#000;padding:13px;border-radius:8px;font-weight:800;font-size:1rem;cursor:pointer;">
-        Kayıt Ol</button>
-      <button id="authToggleBtn" onclick="toggleAuthMode()" style="width:100%;margin-top:12px;background:transparent;
-        border:none;color:#5a6a7e;font-size:0.85rem;cursor:pointer;padding:8px;">
-        Zaten hesabın var mı? Giriş yap</button>
+        ${isLogin?"Giriş Yap":"Kayıt Ol"}</button>
+      <button onclick="renderAuth('${isLogin?'register':'login'}')" style="width:100%;margin-top:12px;background:transparent;
+        border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#5a6a7e;font-size:0.85rem;cursor:pointer;padding:10px;">
+        ${isLogin?"Hesabın yok mu? Kayıt ol":"Zaten hesabın var mı? Giriş yap"}</button>
       <p style="text-align:center;color:#5a6a7e;font-size:0.75rem;margin-top:16px;line-height:1.5;">
         🔒 Verilen bilgiler sadece YKS takibinde kullanılır.</p>
     </div>

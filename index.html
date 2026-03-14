@@ -41,7 +41,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile }
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, browserSessionPersistence, setPersistence }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -58,6 +58,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Oturumu sadece sekme açık olduğu sürece tut — farklı kullanıcılar arası karışma önlenir
+setPersistence(auth, browserSessionPersistence).catch(()=>{});
 
 const TYT_DATE = new Date("2026-06-20T09:00:00");
 const AYT_DATE = new Date("2026-06-21T09:00:00");
@@ -448,15 +451,26 @@ function todayTotalStudy(){
 async function loadUserData(uid){
   const ref = doc(db,"users",uid);
   const snap = await getDoc(ref);
-  if(snap.exists()) userData = { done:{}, xp:0, streak:[], name:"", studySeconds:{}, exams:[], weeklyGoalHours:8, streakRecord:0, ...snap.data() };
-  else userData = { done:{}, xp:0, streak:[], name: currentUser.displayName||"", studySeconds:{}, exams:[], weeklyGoalHours:8, streakRecord:0 };
+  console.log("🔍 loadUserData uid:", uid, "exists:", snap.exists());
+  if(snap.exists()){
+    const data = snap.data();
+    console.log("🔍 loaded name:", data.name, "xp:", data.xp, "done keys:", Object.keys(data.done||{}).length);
+    userData = { done:{}, xp:0, streak:[], name:"", studySeconds:{}, exams:[], weeklyGoalHours:8, streakRecord:0, ...data };
+  } else {
+    console.log("🔍 no data found, fresh user");
+    userData = { done:{}, xp:0, streak:[], name: currentUser.displayName||"", studySeconds:{}, exams:[], weeklyGoalHours:8, streakRecord:0 };
+  }
+  console.log("🔍 userData.name after load:", userData.name);
 }
 
 function scheduleSave(){
   if(saveTimeout) clearTimeout(saveTimeout);
+  // uid'yi şu an yakala, 1.2 saniye sonra farklı kullanıcı olabilir
+  const uid = currentUser?.uid;
+  const snapshot = JSON.parse(JSON.stringify(userData)); // deep copy
   saveTimeout = setTimeout(async ()=>{
-    if(!currentUser) return;
-    await setDoc(doc(db,"users",currentUser.uid), userData, {merge:true});
+    if(!uid || !currentUser || currentUser.uid !== uid) return;
+    await setDoc(doc(db,"users",uid), snapshot, {merge:false}); // merge:false → tamamen yeniden yaz
   }, 1200);
 }
 
@@ -464,12 +478,22 @@ function scheduleSave(){
 onAuthStateChanged(auth, async user=>{
   currentUser = user;
   if(user){
+    // Önce state'i tamamen sıfırla, eski kullanıcı verisi kalmasın
+    userData = { done:{}, xp:0, streak:[], name:"", studySeconds:{}, exams:[], weeklyGoalHours:8, streakRecord:0 };
+    // Timer'ı durdur ve sıfırla
+    if(timerRunning){ clearInterval(timerInterval); timerRunning=false; timerStart=null; }
+    timerElapsed=0;
     showLoading("Veriler yükleniyor...");
     await loadUserData(user.uid);
     activePage="dashboard";
     render();
   } else {
+    // Çıkış yapınca state'i sıfırla
+    userData = { done:{}, xp:0, streak:[], name:"", studySeconds:{}, exams:[], weeklyGoalHours:8, streakRecord:0 };
+    if(timerRunning){ clearInterval(timerInterval); timerRunning=false; timerStart=null; }
+    timerElapsed=0;
     activePage="auth";
+    authMode="login";
     render();
   }
 });
@@ -653,8 +677,9 @@ async function doRegister(){
   try{
     const cred=await createUserWithEmailAndPassword(auth,email,pass);
     await updateProfile(cred.user,{displayName:name});
-    userData.name=name;
-    await setDoc(doc(db,"users",cred.user.uid),userData);
+    // Yeni kullanıcı için HER ZAMAN temiz veri yaz — bellekteki userData'yı kullanma
+    const freshData = { done:{}, xp:0, streak:[], name:name, studySeconds:{}, exams:[], weeklyGoalHours:8, streakRecord:0 };
+    await setDoc(doc(db,"users",cred.user.uid), freshData);
   } catch(e){
     if(e.code==="auth/email-already-in-use") err.textContent="Bu e-posta zaten kayıtlı!";
     else if(e.code==="auth/invalid-email") err.textContent="Geçersiz e-posta adresi!";
@@ -676,6 +701,8 @@ async function doLogin(){
   }
 }
 async function doLogout(){
+  // Bekleyen kayıtları iptal et
+  if(saveTimeout){ clearTimeout(saveTimeout); saveTimeout=null; }
   if(timerRunning) timerStartStop();
   await signOut(auth);
 }
@@ -1433,3 +1460,6 @@ document.addEventListener("DOMContentLoaded",()=>{
 </script>
 </body>
 </html>
+
+
+

@@ -394,7 +394,7 @@ const MOTIVATION = "Vazgeçmediğin sürece kaybetmezsin.";
 
 // ── STATE ─────────────────────────────────────────────────────
 let currentUser = null;
-let userData = { done:{}, xp:0, streak:[], name:"", studySeconds:{} };
+let userData = { done:{}, xp:0, streak:[], name:"", studySeconds:{}, exams:[], weeklyGoalHours:8, streakRecord:0 };
 let activePage = "auth";
 let activeSub = "tyt-mat";
 let saveTimeout = null;
@@ -448,8 +448,8 @@ function todayTotalStudy(){
 async function loadUserData(uid){
   const ref = doc(db,"users",uid);
   const snap = await getDoc(ref);
-  if(snap.exists()) userData = { done:{}, xp:0, streak:[], name:"", studySeconds:{}, ...snap.data() };
-  else userData = { done:{}, xp:0, streak:[], name: currentUser.displayName||"", studySeconds:{} };
+  if(snap.exists()) userData = { done:{}, xp:0, streak:[], name:"", studySeconds:{}, exams:[], weeklyGoalHours:8, streakRecord:0, ...snap.data() };
+  else userData = { done:{}, xp:0, streak:[], name: currentUser.displayName||"", studySeconds:{}, exams:[], weeklyGoalHours:8, streakRecord:0 };
 }
 
 function scheduleSave(){
@@ -535,6 +535,17 @@ function timerStartStop(){
     timerStart = Date.now();
     timerRunning = true;
     timerInterval = setInterval(timerTick, 1000);
+    // Bugünü streak'e ekle
+    const t=todayStr();
+    if(!userData.streak) userData.streak=[];
+    if(!userData.streak.includes(t)){
+      userData.streak.push(t);
+      updateStreakRecord();
+      scheduleSave();
+      // Uyarı banner'ını kaldır
+      const banner=document.getElementById("noChallengeWarning");
+      if(banner) banner.remove();
+    }
     const btn = document.getElementById("timerBtn");
     if(btn){ btn.textContent="⏸ Durdur"; btn.style.background="#ff4757"; }
     const dot = document.getElementById("timerDot");
@@ -563,6 +574,25 @@ function timerReset(){
   timerTick();
 }
 
+// ── WEEKLY STUDY ─────────────────────────────────────────────
+function weekStudySeconds(){
+  const ss = userData.studySeconds||{};
+  let total=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const k=d.toISOString().slice(0,10);
+    total+=(ss[k]||0);
+  }
+  return total;
+}
+function updateStreakRecord(){
+  const cur=countStreak(userData.streak||[]);
+  if(cur>(userData.streakRecord||0)){
+    userData.streakRecord=cur;
+  }
+}
+
+
 // ── TOGGLE TOPIC ─────────────────────────────────────────────
 function toggleTopic(subj,i){
   const key=subj+":"+i;
@@ -572,6 +602,7 @@ function toggleTopic(subj,i){
   const t=todayStr();
   if(!userData.streak) userData.streak=[];
   if(!userData.streak.includes(t)) userData.streak.push(t);
+  updateStreakRecord();
   if(!wasDone){
     userData.xp+=xpAmt;
     const s=calcStats();
@@ -794,7 +825,7 @@ function navHTML(active){
 function attachNav(active){
   const nav=document.getElementById("mainNav");
   if(!nav) return;
-  [["dashboard","📊 Panel"],["topics","📚 Konular"],["coach","🤖 Koç"]].forEach(([p,label])=>{
+  [["dashboard","📊 Panel"],["topics","📚 Konular"],["exams","📝 Denemeler"],["coach","🤖 Koç"]].forEach(([p,label])=>{
     const btn=document.createElement("button");
     btn.style.cssText=`background:${active===p?"rgba(0,212,255,0.1)":"transparent"};
       border:1px solid ${active===p?"#00d4ff":"rgba(255,255,255,0.07)"};
@@ -818,6 +849,7 @@ function render(){
   if(activePage==="dashboard") { renderDashboard(); return; }
   if(activePage==="topics")    { renderTopicsPage(); return; }
   if(activePage==="coach")     { renderCoachPage(); return; }
+  if(activePage==="exams")     { renderExamsPage(); return; }
 }
 
 function renderAuth(){
@@ -872,9 +904,26 @@ function renderDashboard(){
   const tytPct=s.tT?Math.round(s.tD/s.tT*100):0;
   const aytPct=s.aT?Math.round(s.aD/s.aT*100):0;
   const streak=countStreak(userData.streak||[]);
+  const streakRecord=userData.streakRecord||streak;
+  const weekSec=weekStudySeconds();
+  const weekGoalSec=(userData.weeklyGoalHours||8)*3600;
+  const weekPct=Math.min(100,Math.round(weekSec/weekGoalSec*100));
+  const studiedToday=(userData.streak||[]).includes(todayStr());
+
   document.getElementById("root").innerHTML=`
   <div style="max-width:1280px;margin:0 auto;padding:24px 20px;">
     ${navHTML("dashboard")}
+
+    ${!studiedToday?`
+    <!-- Uyarı banner -->
+    <div id="noChallengeWarning" style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.3);border-radius:10px;
+      padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:1.4rem;">⚠️</div>
+      <div>
+        <div style="font-weight:700;color:#ff4757;font-size:0.9rem;">Bugün henüz çalışmadın!</div>
+        <div style="font-size:0.8rem;color:#5a6a7e;margin-top:2px;">Serini kırmamak için en az bir konu tikle veya kronometreyi başlat.</div>
+      </div>
+    </div>`:""}
 
     <!-- Geri sayım -->
     <div style="background:#0d1421;border:1px solid rgba(255,255,255,0.07);border-radius:16px;
@@ -895,10 +944,11 @@ function renderDashboard(){
     <!-- İstatistik kartları -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px;">
       ${[
-        {v:s.total,       l:"KONU BİTİRİLDİ", c:"#2ed573", id:"sTotalDone"},
-        {v:s.all-s.total, l:"KONU KALDI",      c:"#5a6a7e", id:"sTotalLeft"},
-        {v:userData.xp,   l:"TOPLAM XP",       c:"#ffd60a", id:"sXP"},
-        {v:streak+" 🔥",  l:"GÜN SERİSİ",     c:"#a855f7", id:"sStreak"},
+        {v:s.total,        l:"KONU BİTİRİLDİ", c:"#2ed573", id:"sTotalDone"},
+        {v:s.all-s.total,  l:"KONU KALDI",      c:"#5a6a7e", id:"sTotalLeft"},
+        {v:userData.xp,    l:"TOPLAM XP",       c:"#ffd60a", id:"sXP"},
+        {v:streak+" 🔥",   l:"GÜN SERİSİ",     c:"#a855f7", id:"sStreak"},
+        {v:streakRecord+"⭐",l:"SERİ REKORU",   c:"#ff6b35", id:"sStreakRecord"},
       ].map(c=>`<div style="background:#0d1421;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;text-align:center;">
         <div id="${c.id}" style="font-size:2rem;font-weight:800;color:${c.c};margin-bottom:4px;">${c.v}</div>
         <div style="font-family:monospace;font-size:0.62rem;letter-spacing:2px;color:#5a6a7e;">${c.l}</div>
@@ -933,11 +983,41 @@ function renderDashboard(){
       </div>`).join("")}
     </div>
 
+    <!-- Haftalık Hedef -->
+    <div style="background:#0d1421;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;font-family:monospace;">🎯 HAFTALIK ÇALIŞMA HEDEFİ</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:monospace;font-size:0.72rem;color:#5a6a7e;">Hedef:</span>
+          <input id="weeklyGoalInput" type="number" min="1" max="100" value="${userData.weeklyGoalHours||8}"
+            style="width:52px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+            border-radius:6px;padding:4px 8px;color:#e8edf5;font-family:monospace;font-size:0.8rem;text-align:center;outline:none;">
+          <span style="font-family:monospace;font-size:0.72rem;color:#5a6a7e;">saat</span>
+        </div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-family:monospace;font-size:0.72rem;color:#2ed573;">${fmtTime(weekSec)} çalışıldı</span>
+          <span style="font-family:monospace;font-size:0.72rem;color:#5a6a7e;">${weekPct}% tamamlandı</span>
+        </div>
+        <div style="background:rgba(255,255,255,0.06);border-radius:100px;height:10px;overflow:hidden;">
+          <div style="height:100%;border-radius:100px;width:${weekPct}%;
+            background:linear-gradient(90deg,#2ed573,#00d4ff);transition:width 0.8s;"></div>
+        </div>
+      </div>
+      <div style="font-family:monospace;font-size:0.7rem;color:#5a6a7e;">
+        Kalan: ${fmtTime(Math.max(0,weekGoalSec-weekSec))} &nbsp;·&nbsp; Bu haftanın son 7 günü sayılır
+      </div>
+    </div>
+
     <!-- Seri -->
     <div style="background:#0d1421;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
         <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;font-family:monospace;">BU HAFTAKİ SERİ</div>
-        <div style="font-family:monospace;font-size:0.75rem;color:#2ed573;">${streak} gün üst üste 🔥</div>
+        <div style="display:flex;gap:16px;">
+          <div style="font-family:monospace;font-size:0.75rem;color:#2ed573;">${streak} gün üst üste 🔥</div>
+          <div style="font-family:monospace;font-size:0.75rem;color:#ff6b35;">Rekor: ${streakRecord} gün ⭐</div>
+        </div>
       </div>
       <div id="streakRow" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;"></div>
       <div style="margin-top:12px;font-size:0.78rem;color:#5a6a7e;font-family:monospace;">
@@ -972,6 +1052,14 @@ function renderDashboard(){
       </div>
     </div>
 
+    <!-- Ders Bazlı İlerleme (Pasta) -->
+    <div style="background:#0d1421;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
+      <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;margin-bottom:16px;font-family:monospace;">
+        🍩 DERS BAZLI İLERLEME
+      </div>
+      <div id="donutSection" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
+    </div>
+
     <!-- Motivasyon -->
     <div style="background:linear-gradient(135deg,rgba(0,212,255,0.05),rgba(255,107,53,0.05));
       border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:24px;">
@@ -985,11 +1073,10 @@ function renderDashboard(){
 
   attachNav("dashboard");
   renderStats();
+  renderDonutSection();
 
-  // Timer buton event'leri
   document.getElementById("timerBtn").addEventListener("click", timerStartStop);
   document.getElementById("timerResetBtn").addEventListener("click", timerReset);
-  // Eğer timer zaten çalışıyorsa UI'yi düzelt
   if(timerRunning){
     const btn=document.getElementById("timerBtn");
     if(btn){ btn.textContent="⏸ Durdur"; btn.style.background="#ff4757"; }
@@ -997,6 +1084,14 @@ function renderDashboard(){
     if(dot) dot.style.animation="pulse 1s infinite";
   }
   timerTick();
+
+  // Weekly goal input
+  document.getElementById("weeklyGoalInput").addEventListener("change", e=>{
+    const v=parseInt(e.target.value)||8;
+    userData.weeklyGoalHours=Math.max(1,Math.min(100,v));
+    scheduleSave();
+    renderDashboard();
+  });
 }
 
 function renderTopicsPage(){
@@ -1068,6 +1163,262 @@ function renderCoachPage(){
   document.getElementById("coachInp").addEventListener("keydown", e=>{ if(e.key==="Enter") sendToCoach(); });
   const stats=calcStats();
   appendChat(`Merhaba ${userData.name||""}! 👋 TYT'ye ${daysTo(TYT_DATE)} günün var. Şu ana kadar ${stats.total} konu bitirmişsin, bugün ${fmtTime(todayTotalStudy())} çalıştın — devam et! Ne sormak istiyorsun? 💪`,"coach");
+}
+
+// ── EXAMS PAGE ────────────────────────────────────────────────
+function renderExamsPage(){
+  document.getElementById("root").innerHTML=`
+  <div style="max-width:1280px;margin:0 auto;padding:24px 20px;">
+    ${navHTML("exams")}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;font-family:monospace;">📝 DENEME SINAVI TAKİBİ</div>
+      <div style="display:flex;gap:8px;">
+        <button id="addTytBtn" style="background:rgba(0,212,255,0.1);border:1px solid #00d4ff;color:#00d4ff;
+          padding:8px 16px;border-radius:8px;font-family:monospace;font-size:0.72rem;cursor:pointer;letter-spacing:1px;">+ TYT Denemesi</button>
+        <button id="addAytBtn" style="background:rgba(255,107,53,0.1);border:1px solid #ff6b35;color:#ff6b35;
+          padding:8px 16px;border-radius:8px;font-family:monospace;font-size:0.72rem;cursor:pointer;letter-spacing:1px;">+ AYT Denemesi</button>
+      </div>
+    </div>
+    <div id="examForm" style="display:none;background:#0d1421;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:24px;margin-bottom:20px;"></div>
+    <div id="examList"></div>
+  </div>`;
+  attachNav("exams");
+  document.getElementById("addTytBtn").addEventListener("click",()=>showExamForm("tyt"));
+  document.getElementById("addAytBtn").addEventListener("click",()=>showExamForm("ayt"));
+  renderExamList();
+}
+
+let examFormType=null, examEditIdx=null;
+
+const TYT_EXAM_SUBJECTS=[
+  {key:"tyt-turk",label:"Türkçe",   total:40},
+  {key:"tyt-sos", label:"Sosyal",   total:20},
+  {key:"tyt-mat", label:"Matematik",total:40},
+  {key:"tyt-fen", label:"Fen",      total:20},
+];
+const AYT_EXAM_SUBJECTS=[
+  {key:"ayt-mat", label:"Matematik",total:30},
+  {key:"ayt-geo", label:"Geometri", total:10},
+  {key:"ayt-fiz", label:"Fizik",    total:14},
+  {key:"ayt-kim", label:"Kimya",    total:13},
+  {key:"ayt-bio", label:"Biyoloji", total:13},
+];
+function calcNet(d,y){ return d-y/4; }
+function calcExamTotals(exam){
+  const subs=exam.type==="tyt"?TYT_EXAM_SUBJECTS:AYT_EXAM_SUBJECTS;
+  let t=0; subs.forEach(s=>{ t+=calcNet(exam.scores?.[s.key]?.d||0, exam.scores?.[s.key]?.y||0); }); return Math.round(t*100)/100;
+}
+
+function showExamForm(type, editIdx=null){
+  examFormType=type; examEditIdx=editIdx;
+  const subs=type==="tyt"?TYT_EXAM_SUBJECTS:AYT_EXAM_SUBJECTS;
+  const ex=editIdx!==null?(userData.exams||[])[editIdx]:null;
+  const form=document.getElementById("examForm");
+  form.style.display="block";
+  const color=type==="tyt"?"#00d4ff":"#ff6b35";
+  form.innerHTML=`
+    <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:${color};margin-bottom:16px;font-family:monospace;">
+      ${editIdx!==null?"✏️ DÜZENLE":"📋 YENİ DENEME"} — ${type.toUpperCase()}
+    </div>
+    <div style="display:flex;gap:12px;align-items:flex-end;margin-bottom:20px;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:monospace;font-size:0.65rem;color:#5a6a7e;margin-bottom:4px;">TARİH</div>
+        <input id="examDate" type="date" value="${ex?.date||new Date().toISOString().slice(0,10)}"
+          style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:8px 12px;color:#e8edf5;font-family:monospace;font-size:0.85rem;outline:none;">
+      </div>
+      <div style="flex:1;min-width:180px;">
+        <div style="font-family:monospace;font-size:0.65rem;color:#5a6a7e;margin-bottom:4px;">DENEME ADI</div>
+        <input id="examName" type="text" placeholder="örn. TYT Deneme #1" value="${ex?.name||""}"
+          style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:8px 12px;color:#e8edf5;font-family:inherit;font-size:0.85rem;outline:none;box-sizing:border-box;">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;margin-bottom:20px;">
+      ${subs.map(s=>{
+        const d=ex?.scores?.[s.key]?.d||0, y=ex?.scores?.[s.key]?.y||0;
+        return `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:14px;">
+          <div style="font-family:monospace;font-size:0.7rem;color:${color};margin-bottom:6px;font-weight:700;">${s.label} <span style="color:#5a6a7e;font-weight:400;">(${s.total})</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div><div style="font-family:monospace;font-size:0.58rem;color:#2ed573;margin-bottom:3px;">DOĞRU</div>
+              <input id="d_${s.key}" type="number" min="0" max="${s.total}" value="${d}"
+                style="width:100%;background:rgba(46,213,115,0.08);border:1px solid rgba(46,213,115,0.2);border-radius:6px;padding:7px;color:#2ed573;font-family:monospace;font-size:1rem;font-weight:700;text-align:center;outline:none;box-sizing:border-box;"></div>
+            <div><div style="font-family:monospace;font-size:0.58rem;color:#ff4757;margin-bottom:3px;">YANLIŞ</div>
+              <input id="y_${s.key}" type="number" min="0" max="${s.total}" value="${y}"
+                style="width:100%;background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:6px;padding:7px;color:#ff4757;font-family:monospace;font-size:1rem;font-weight:700;text-align:center;outline:none;box-sizing:border-box;"></div>
+          </div>
+          <div id="net_${s.key}" style="font-family:monospace;font-size:0.78rem;color:#ffd60a;margin-top:8px;text-align:right;font-weight:700;">Net: ${calcNet(d,y).toFixed(2)}</div>
+        </div>`;
+      }).join("")}
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button id="examCancelBtn" style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:#5a6a7e;padding:10px 20px;border-radius:8px;cursor:pointer;font-family:monospace;font-size:0.8rem;">İptal</button>
+      <button id="examSaveBtn" style="background:${color};border:none;color:#000;padding:10px 24px;border-radius:8px;font-weight:800;cursor:pointer;font-family:monospace;font-size:0.8rem;">💾 Kaydet</button>
+    </div>`;
+  subs.forEach(s=>{
+    const upd=()=>{ const d=parseFloat(document.getElementById("d_"+s.key)?.value)||0,y=parseFloat(document.getElementById("y_"+s.key)?.value)||0,el=document.getElementById("net_"+s.key); if(el) el.textContent=`Net: ${calcNet(d,y).toFixed(2)}`; };
+    document.getElementById("d_"+s.key)?.addEventListener("input",upd);
+    document.getElementById("y_"+s.key)?.addEventListener("input",upd);
+  });
+  document.getElementById("examCancelBtn").addEventListener("click",()=>{ form.style.display="none"; examFormType=null; examEditIdx=null; });
+  document.getElementById("examSaveBtn").addEventListener("click",saveExam);
+}
+
+function saveExam(){
+  const type=examFormType;
+  const subs=type==="tyt"?TYT_EXAM_SUBJECTS:AYT_EXAM_SUBJECTS;
+  const scores={};
+  subs.forEach(s=>{ scores[s.key]={d:Math.max(0,parseInt(document.getElementById("d_"+s.key)?.value)||0),y:Math.max(0,parseInt(document.getElementById("y_"+s.key)?.value)||0)}; });
+  const exam={type,date:document.getElementById("examDate").value||new Date().toISOString().slice(0,10),name:document.getElementById("examName").value.trim()||`${type.toUpperCase()} Denemesi`,scores};
+  if(!userData.exams) userData.exams=[];
+  if(examEditIdx!==null) userData.exams[examEditIdx]=exam; else userData.exams.push(exam);
+  scheduleSave();
+  document.getElementById("examForm").style.display="none";
+  examFormType=null; examEditIdx=null;
+  renderExamList();
+}
+
+function renderExamList(){
+  const container=document.getElementById("examList");
+  if(!container) return;
+  if(!(userData.exams||[]).length){
+    container.innerHTML=`<div style="text-align:center;padding:48px;color:#5a6a7e;font-family:monospace;font-size:0.85rem;">Henüz deneme eklenmedi.<br><span style="opacity:0.6;">Yukarıdan deneme ekle.</span></div>`;
+    return;
+  }
+  const sorted=(userData.exams||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const tytE=sorted.filter(e=>e.type==="tyt").slice(0,10).reverse();
+  const aytE=sorted.filter(e=>e.type==="ayt").slice(0,10).reverse();
+  let html="";
+  if(tytE.length>1||aytE.length>1){
+    html+=`<div style="background:#0d1421;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
+      <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;margin-bottom:16px;font-family:monospace;">📈 NET GELİŞİM GRAFİĞİ</div>
+      <div id="netChartWrap" style="overflow-x:auto;"></div>
+    </div>`;
+  }
+  html+=`<div style="display:flex;flex-direction:column;gap:14px;">`;
+  sorted.forEach(exam=>{
+    const origIdx=(userData.exams||[]).indexOf(exam);
+    const subs=exam.type==="tyt"?TYT_EXAM_SUBJECTS:AYT_EXAM_SUBJECTS;
+    const color=exam.type==="tyt"?"#00d4ff":"#ff6b35";
+    const totalNet=calcExamTotals(exam);
+    html+=`<div style="background:#0d1421;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <span style="font-family:monospace;font-size:0.62rem;background:${exam.type==="tyt"?"rgba(0,212,255,0.15)":"rgba(255,107,53,0.15)"};color:${color};padding:3px 8px;border-radius:4px;letter-spacing:1px;margin-right:8px;">${exam.type.toUpperCase()}</span>
+          <span style="font-weight:700;font-size:0.95rem;">${exam.name}</span>
+          <span style="font-family:monospace;font-size:0.72rem;color:#5a6a7e;margin-left:8px;">${exam.date}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="text-align:right;">
+            <div style="font-family:monospace;font-size:1.4rem;font-weight:800;color:${color};">${totalNet.toFixed(2)}</div>
+            <div style="font-family:monospace;font-size:0.6rem;color:#5a6a7e;">TOPLAM NET</div>
+          </div>
+          <button data-idx="${origIdx}" class="editExamBtn" style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:#5a6a7e;padding:6px 12px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:0.7rem;">✏️</button>
+          <button data-idx="${origIdx}" class="delExamBtn" style="background:transparent;border:1px solid rgba(255,71,87,0.2);color:#ff4757;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:0.75rem;">🗑</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        ${subs.map(s=>{
+          const d=exam.scores?.[s.key]?.d||0,y=exam.scores?.[s.key]?.y||0,net=calcNet(d,y);
+          return `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:10px 14px;min-width:110px;">
+            <div style="font-family:monospace;font-size:0.62rem;color:${color};margin-bottom:6px;font-weight:700;">${s.label}</div>
+            <div style="display:flex;gap:6px;font-family:monospace;font-size:0.75rem;margin-bottom:4px;">
+              <span style="color:#2ed573;">D:${d}</span><span style="color:#ff4757;">Y:${y}</span><span style="color:#5a6a7e;">B:${Math.max(0,s.total-d-y)}</span>
+            </div>
+            <div style="font-family:monospace;font-size:0.85rem;font-weight:700;color:#ffd60a;">Net: ${net.toFixed(2)}</div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+  });
+  html+=`</div>`;
+  container.innerHTML=html;
+  if(tytE.length>1||aytE.length>1){ const w=document.getElementById("netChartWrap"); if(w) drawNetChart(w,tytE,aytE); }
+  container.querySelectorAll(".editExamBtn").forEach(btn=>btn.addEventListener("click",()=>showExamForm((userData.exams||[])[+btn.dataset.idx].type,+btn.dataset.idx)));
+  container.querySelectorAll(".delExamBtn").forEach(btn=>btn.addEventListener("click",()=>{ if(confirm("Bu denemeyi silmek istiyor musun?")){ userData.exams.splice(+btn.dataset.idx,1); scheduleSave(); renderExamList(); } }));
+}
+
+function drawNetChart(container,tytE,aytE){
+  const allNets=[...tytE.map(e=>calcExamTotals(e)),...aytE.map(e=>calcExamTotals(e))];
+  const maxNet=Math.max(...allNets,1);
+  const minNet=Math.min(...allNets,0);
+  const range=Math.max(maxNet-minNet,1);
+  const cnt=Math.max(tytE.length,aytE.length,2);
+  const W=Math.max(500,cnt*80),H=180,pad={l:36,r:16,t:16,b:32};
+  const cW=W-pad.l-pad.r, cH=H-pad.t-pad.b;
+
+  // y position: higher net = higher on screen (lower y value)
+  function yPos(net){ return pad.t + cH - ((net-minNet)/range)*cH; }
+  function pts(ex){ if(ex.length<2) return null; return ex.map((e,i)=>[ pad.l+(i/(ex.length-1))*cW, yPos(calcExamTotals(e)) ]); }
+  function polyline(p,c){
+    if(!p) return "";
+    const d=p.map((pt,i)=>(i===0?"M":"L")+pt[0].toFixed(1)+","+pt[1].toFixed(1)).join(" ");
+    // value labels above each point
+    const labels=p.map((pt,i)=>{
+      const ex=(c==="#00d4ff"?tytE:aytE)[i];
+      return `<text x="${pt[0].toFixed(1)}" y="${(pt[1]-8).toFixed(1)}" text-anchor="middle" fill="${c}" font-size="9" font-family="monospace" font-weight="600">${calcExamTotals(ex).toFixed(1)}</text>`;
+    }).join("");
+    return `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${p.map(pt=>`<circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}" r="4" fill="${c}" stroke="#080c14" stroke-width="1.5"/>`).join("")}
+      ${labels}`;
+  }
+  const lSrc=tytE.length>=aytE.length?tytE:aytE;
+  const xLabels=lSrc.map((e,i)=>{
+    const x=(pad.l+(i/Math.max(lSrc.length-1,1))*cW).toFixed(1);
+    return `<text x="${x}" y="${H-6}" text-anchor="middle" fill="#5a6a7e" font-size="10" font-family="monospace">${e.date.slice(5)}</text>`;
+  }).join("");
+  const grid=[0,0.25,0.5,0.75,1].map(f=>{
+    const netVal=minNet+f*range;
+    const y=(pad.t+cH-f*cH).toFixed(1);
+    return `<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3,3"/>
+      <text x="${(pad.l-4)}" y="${(parseFloat(y)+3).toFixed(1)}" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="9" font-family="monospace">${netVal.toFixed(0)}</text>`;
+  }).join("");
+
+  container.innerHTML=`
+  <svg width="${W}" height="${H}" style="min-width:${W}px;display:block;">
+    ${grid}
+    ${polyline(pts(tytE),"#00d4ff")}
+    ${polyline(pts(aytE),"#ff6b35")}
+    ${xLabels}
+  </svg>
+  <div style="display:flex;gap:16px;margin-top:8px;">
+    ${tytE.length>0?`<div style="display:flex;align-items:center;gap:6px;"><div style="width:14px;height:3px;background:#00d4ff;border-radius:2px;"></div><span style="font-family:monospace;font-size:0.65rem;color:#5a6a7e;">TYT</span></div>`:""}
+    ${aytE.length>0?`<div style="display:flex;align-items:center;gap:6px;"><div style="width:14px;height:3px;background:#ff6b35;border-radius:2px;"></div><span style="font-family:monospace;font-size:0.65rem;color:#5a6a7e;">AYT</span></div>`:""}
+  </div>`;
+}
+
+// ── DONUT CHART ───────────────────────────────────────────────
+function makeDonut(pct, color, size=72){
+  const r=28, cx=size/2, cy=size/2;
+  const circ=2*Math.PI*r;
+  const dash=circ*(pct/100);
+  const gap=circ-dash;
+  // start from top (-90deg = -PI/2)
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="7"
+      stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
+      stroke-dashoffset="${(circ*0.25).toFixed(2)}"
+      stroke-linecap="round"
+      transform="rotate(-90 ${cx} ${cy})"
+      style="transition:stroke-dasharray 0.8s ease;"/>
+    <text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle"
+      fill="${color}" font-size="11" font-family="monospace" font-weight="700">${pct}%</text>
+  </svg>`;
+}
+
+function renderDonutSection(){
+  const el=document.getElementById("donutSection");
+  if(!el) return;
+  el.innerHTML=Object.entries(SUBJECTS).map(([key,sub])=>{
+    const total=TOPICS[key].length;
+    const done=TOPICS[key].filter((_,i)=>userData.done[key+":"+i]).length;
+    const pct=total?Math.round(done/total*100):0;
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;
+      background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;min-width:90px;">
+      ${makeDonut(pct,sub.color)}
+      <div style="font-family:monospace;font-size:0.58rem;color:#5a6a7e;text-align:center;letter-spacing:0.5px;line-height:1.4;">${sub.label}</div>
+      <div style="font-family:monospace;font-size:0.65rem;color:${sub.color};font-weight:700;">${done}/${total}</div>
+    </div>`;
+  }).join("");
 }
 
 // ── REWARD ────────────────────────────────────────────────────

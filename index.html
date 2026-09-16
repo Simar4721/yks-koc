@@ -1,364 +1,225 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YKS Koçum - YKS Hazırlık Ve Takip Asistanı</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+// ── COACH LOGIC ───────────────────────────────────────────────
+function getCoachRecommendations() {
+  const stats = calcStats();
+  const overallPercent = Math.round((stats.total / stats.all) * 100) || 0;
+  const streak = countStreak(userData.streak || []);
+  const recommendations = [];
 
-  <!-- Firebase SDK Modular Scripts -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { 
-      getAuth, 
-      onAuthStateChanged, 
-      signInWithPopup, 
-      GoogleAuthProvider, 
-      signOut 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { 
-      getFirestore, 
-      doc, 
-      setDoc, 
-      getDoc, 
-      onSnapshot, 
-      updateDoc 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  if (streak === 0) {
+    recommendations.push("Bugün henüz çalışma kaydedilmedi. Serini bozmamak için kronometreyi başlat veya en az bir konu tamamla!");
+  } else {
+    recommendations.push(`Harika gidiyorsun! ${streak} günlük bir çalışma serin var, bunu korumaya devam et.`);
+  }
 
-    // --- Firebase Konfigürasyonu ---
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+  if (overallPercent < 20) {
+    recommendations.push("Henüz yolun başındasın. Önceliğini temel TYT konularına (Matematik ve Türkçe) vererek ivme kazanabilirsin.");
+  } else if (overallPercent < 50) {
+    recommendations.push("Temel gayet iyi oturuyor. Artık YKS netlerini yükseltmek için AYT konularına ağırlık vermenin zamanı geldi.");
+  } else {
+    recommendations.push("Konuların büyük kısmını halletmişsin! Eksik kalan alanları tarayıp branş denemelerine odaklanabilirsin.");
+  }
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
+  return recommendations;
+}
 
-    // --- Uygulama State Yönetimi ---
-    const AppState = {
-      user: null,
-      userData: {
-        targetUniversity: "",
-        targetDepartment: "",
-        examType: "TYT-AYT",
-        todos: [],
-        examResults: [],
-        notes: ""
-      },
-      activeTab: "dashboard",
-      unsubscribeFirestore: null
-    };
+// ── RENDER SYSTEM ─────────────────────────────────────────────
+function renderTopics() {
+  const container = document.getElementById("topicsContainer");
+  if (!container) return;
 
-    function setState(newState) {
-      Object.assign(AppState, newState);
-      renderUI();
-    }
+  const topicsList = TOPICS[activeSub] || [];
+  const currentSub = SUBJECTS[activeSub];
 
-    // --- Veritabanı İşlemleri ---
-    async function initUserFirestore(user) {
-      if (!user) return;
-      const userDocRef = doc(db, "users", user.uid);
+  let html = `<div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+    <h3 style="color:${currentSub.color}">${currentSub.label} Konuları</h3>
+    <span style="font-size:0.85rem;color:var(--text2);">${topicsList.filter((_, i) => userData.done[activeSub + ":" + i]).length} / ${topicsList.length} Tamamlandı</span>
+  </div>`;
 
-      if (AppState.unsubscribeFirestore) {
-        AppState.unsubscribeFirestore();
-      }
+  html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">`;
+  
+  topicsList.forEach((topic, i) => {
+    const isDone = !!userData.done[activeSub + ":" + i];
+    html += `
+      <div onclick="window.toggleTopic('${activeSub}',${i})" style="
+        background:var(--bg2);
+        border:1px solid ${isDone ? currentSub.color : 'var(--border)'};
+        padding:12px 16px;
+        border-radius:10px;
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        transition:all 0.2s;
+      ">
+        <span style="font-size:0.9rem;${isDone ? 'text-decoration:line-through;color:var(--text2);' : ''}">${topic}</span>
+        <span style="font-size:1.1rem;">${isDone ? '✅' : '⚪'}</span>
+      </div>
+    `;
+  });
 
-      try {
-        const docSnap = await getDoc(userDocRef);
-        if (!docSnap.exists()) {
-          await setDoc(userDocRef, AppState.userData);
-        }
+  html += `</div>`;
+  container.innerHTML = html;
+}
 
-        const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
-          if (snapshot.exists()) {
-            AppState.userData = snapshot.data();
-            renderUI();
-          }
-        }, (error) => {
-          console.error("Firestore dinleme hatası:", error);
-        });
+function renderStats() {
+  const stats = calcStats();
+  const lvl = getLevel(userData.xp);
 
-        AppState.unsubscribeFirestore = unsubscribe;
-      } catch (error) {
-        console.error("Veritabanı başlatma hatası:", error);
-      }
-    }
+  const xpEl = document.getElementById("statXP");
+  if (xpEl) xpEl.textContent = userData.xp;
 
-    async function syncToFirestore() {
-      if (!AppState.user) return;
-      try {
-        const userDocRef = doc(db, "users", AppState.user.uid);
-        await updateDoc(userDocRef, AppState.userData);
-      } catch (error) {
-        console.error("Veri senkronizasyon hatası:", error);
-      }
-    }
+  const lvlEl = document.getElementById("statLevel");
+  if (lvlEl) lvlEl.textContent = lvl.lvl.name;
 
-    // --- Auth İşlemleri ---
-    window.handleLogin = async () => {
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        alert("Giriş yapılırken bir hata oluştu: " + error.message);
-      }
-    };
+  const progressEl = document.getElementById("statProgress");
+  if (progressEl) progressEl.style.width = lvl.pct + "%";
+}
 
-    window.handleLogout = async () => {
-      try {
-        if (AppState.unsubscribeFirestore) {
-          AppState.unsubscribeFirestore();
-        }
-        await signOut(auth);
-        setState({
-          user: null,
-          userData: { targetUniversity: "", targetDepartment: "", examType: "TYT-AYT", todos: [], examResults: [], notes: "" },
-          unsubscribeFirestore: null
-        });
-      } catch (error) {
-        alert("Çıkış yapılırken bir hata oluştu: " + error.message);
-      }
-    };
+function renderAuth() {
+  const isReg = authMode === "register";
+  document.getElementById("root").innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:400px;box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+        <h2 style="text-align:center;margin-bottom:8px;font-weight:800;color:var(--accent);">YKSKoç</h2>
+        <p style="text-align:center;color:var(--text2);font-size:0.85rem;margin-bottom:24px;">${isReg ? 'Yeni bir hesap oluştur' : 'Hesabına giriş yap'}</p>
+        
+        <div id="authErr" style="color:#ff4757;font-size:0.85rem;margin-bottom:12px;text-align:center;min-height:1.2em;"></div>
+        
+        ${isReg ? `<input type="text" id="authName" placeholder="Ad Soyad" style="width:100%;padding:12px;margin-bottom:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);">` : ''}
+        <input type="email" id="authEmail" placeholder="E-Posta" style="width:100%;padding:12px;margin-bottom:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);">
+        <input type="password" id="authPass" placeholder="Şifre" style="width:100%;padding:12px;margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);">
+        
+        <button onclick="${isReg ? 'window.doRegister()' : 'window.doLogin()'}" style="width:100%;padding:12px;background:var(--accent);border:none;border-radius:8px;color:#000;font-weight:700;cursor:pointer;margin-bottom:12px;">
+          ${isReg ? 'Kayıt Ol' : 'Giriş Yap'}
+        </button>
 
-    // Auth Durum Dinleyicisi
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        AppState.user = user;
-        await initUserFirestore(user);
-      } else {
-        AppState.user = null;
-      }
-      renderUI();
-    });
-
-    // --- İş Mantığı (Actions) ---
-    window.switchTab = (tabName) => {
-      AppState.activeTab = tabName;
-      renderUI();
-    };
-
-    window.addTodo = async (event) => {
-      event.preventDefault();
-      const input = document.getElementById("todo-input");
-      const text = input.value.trim();
-      if (!text) return;
-
-      const newTodo = { id: Date.now(), text, completed: false };
-      AppState.userData.todos.push(newTodo);
-      input.value = "";
-      
-      renderUI();
-      await syncToFirestore();
-    };
-
-    window.toggleTodo = async (id) => {
-      AppState.userData.todos = AppState.userData.todos.map(t => 
-        t.id === id ? { ...t, completed: !t.completed } : t
-      );
-      renderUI();
-      await syncToFirestore();
-    };
-
-    window.deleteTodo = async (id) => {
-      AppState.userData.todos = AppState.userData.todos.filter(t => t.id !== id);
-      renderUI();
-      await syncToFirestore();
-    };
-
-    window.addExamResult = async (event) => {
-      event.preventDefault();
-      const name = document.getElementById("exam-name").value;
-      const net = parseFloat(document.getElementById("exam-net").value);
-
-      if (!name || isNaN(net)) return;
-
-      AppState.userData.examResults.push({ id: Date.now(), name, net, date: new Date().toLocaleDateString("tr-TR") });
-      document.getElementById("exam-form").reset();
-
-      renderUI();
-      await syncToFirestore();
-    };
-
-    // --- UI Render İşlemleri ---
-    function renderUI() {
-      const appDiv = document.getElementById("app");
-
-      // Orijinal Basit Giriş Ekranı
-      if (!AppState.user) {
-        appDiv.innerHTML = `
-          <div class="min-h-screen flex items-center justify-center bg-gray-100">
-            <div class="bg-white p-8 rounded-lg shadow-md text-center max-w-sm w-full">
-              <h1 class="text-2xl font-bold mb-4">YKSKoç Giriş</h1>
-              <button onclick="handleLogin()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full flex items-center justify-center gap-2">
-                <i class="fa-brands fa-google"></i> Google ile Giriş Yap
-              </button>
-            </div>
-          </div>
-        `;
-        return;
-      }
-
-      appDiv.innerHTML = `
-        <div class="min-h-screen bg-gray-50 flex flex-col md:flex-row">
-          <!-- Sol Sidebar -->
-          <aside class="w-full md:w-64 bg-slate-900 text-white p-5 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center gap-3 mb-8">
-                <i class="fa-solid fa-graduation-cap text-2xl text-blue-400"></i>
-                <span class="font-bold text-xl tracking-wide">YKS Koçum</span>
-              </div>
-              <nav class="space-y-2">
-                <button onclick="switchTab('dashboard')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${AppState.activeTab === 'dashboard' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}">
-                  <i class="fa-solid fa-chart-line"></i> Genel Bakış
-                </button>
-                <button onclick="switchTab('todos')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${AppState.activeTab === 'todos' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}">
-                  <i class="fa-solid fa-list-check"></i> Görevlerim
-                </button>
-                <button onclick="switchTab('exams')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${AppState.activeTab === 'exams' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}">
-                  <i class="fa-solid fa-pen-ruler"></i> Deneme Takibi
-                </button>
-              </nav>
-            </div>
-            
-            <div class="pt-6 border-t border-slate-800 flex items-center justify-between">
-              <div class="flex items-center gap-3 overflow-hidden">
-                <img src="${AppState.user.photoURL || 'https://via.placeholder.com/40'}" class="w-9 h-9 rounded-full object-cover" alt="Profil">
-                <div class="truncate">
-                  <p class="text-sm font-medium text-white truncate">${AppState.user.displayName}</p>
-                  <p class="text-xs text-slate-400 truncate">${AppState.user.email}</p>
-                </div>
-              </div>
-              <button onclick="handleLogout()" title="Çıkış Yap" class="text-slate-400 hover:text-red-400 p-2 transition">
-                <i class="fa-solid fa-right-from-bracket"></i>
-              </button>
-            </div>
-          </aside>
-
-          <!-- Ana İçerik Alanı -->
-          <main class="flex-1 p-6 md:p-10 overflow-y-auto">
-            ${renderMainContent()}
-          </main>
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text2);">
+          <span style="cursor:pointer;" onclick="window.toggleAuthMode()">${isReg ? 'Zaten hesabın var mı? Giriş yap' : 'Hesabın yok mu? Kayıt ol'}</span>
+          ${!isReg ? `<span style="cursor:pointer;" onclick="window.doForgotPassword()">Şifremi Unuttum</span>` : ''}
         </div>
-      `;
-
-      if (AppState.activeTab === 'exams') {
-        renderChart();
-      }
-    }
-
-    function renderMainContent() {
-      if (AppState.activeTab === 'dashboard') {
-        const completedCount = AppState.userData.todos.filter(t => t.completed).length;
-        const totalCount = AppState.userData.todos.length;
-
-        return `
-          <div class="max-w-4xl space-y-6">
-            <h2 class="text-2xl font-bold text-gray-800">Hoş Geldin, ${AppState.user.displayName} 👋</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <p class="text-sm text-gray-500 mb-1">Tamamlanan Görevler</p>
-                <p class="text-3xl font-bold text-gray-800">${completedCount} / ${totalCount}</p>
-              </div>
-              <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <p class="text-sm text-gray-500 mb-1">Girilen Deneme</p>
-                <p class="text-3xl font-bold text-gray-800">${AppState.userData.examResults.length}</p>
-              </div>
-              <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <p class="text-sm text-gray-500 mb-1">Hedef Bölüm</p>
-                <p class="text-xl font-bold text-blue-600 truncate">${AppState.userData.targetDepartment || 'Henüz Belirtilmedi'}</p>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      if (AppState.activeTab === 'todos') {
-        return `
-          <div class="max-w-2xl space-y-6">
-            <h2 class="text-2xl font-bold text-gray-800">Çalışma Listesi</h2>
-            <form onsubmit="addTodo(event)" class="flex gap-2">
-              <input type="text" id="todo-input" placeholder="Yeni çalışma görevi ekle..." required class="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition">Ekle</button>
-            </form>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y">
-              ${AppState.userData.todos.length === 0 ? '<p class="p-4 text-center text-gray-400">Henüz eklenmiş bir görev bulunmuyor.</p>' : ''}
-              ${AppState.userData.todos.map(todo => `
-                <div class="p-4 flex items-center justify-between">
-                  <div class="flex items-center gap-3">
-                    <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo(${todo.id})" class="w-5 h-5 accent-blue-600 rounded cursor-pointer">
-                    <span class="${todo.completed ? 'line-through text-gray-400' : 'text-gray-700'}">${todo.text}</span>
-                  </div>
-                  <button onclick="deleteTodo(${todo.id})" class="text-red-500 hover:text-red-700 text-sm">Sil</button>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
-
-      if (AppState.activeTab === 'exams') {
-        return `
-          <div class="max-w-3xl space-y-6">
-            <h2 class="text-2xl font-bold text-gray-800">Deneme Takibi</h2>
-            
-            <form id="exam-form" onsubmit="addExamResult(event)" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex gap-4">
-              <input type="text" id="exam-name" placeholder="Deneme Adı (Örn: Özdebir 1)" required class="flex-1 px-4 py-2 border rounded-xl">
-              <input type="number" step="0.25" id="exam-net" placeholder="Toplam Net" required class="w-32 px-4 py-2 border rounded-xl">
-              <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition">Kaydet</button>
-            </form>
-
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <canvas id="examChart" class="max-h-80"></canvas>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    function renderChart() {
-      const ctx = document.getElementById('examChart');
-      if (!ctx) return;
-
-      const labels = AppState.userData.examResults.map(e => e.name);
-      const data = AppState.userData.examResults.map(e => e.net);
-
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Deneme Netleri',
-            data,
-            borderColor: '#2563eb',
-            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-            fill: true,
-            tension: 0.3
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
-    }
-  </script>
-</head>
-<body class="bg-gray-50 font-sans antialiased">
-  <div id="app">
-    <div class="min-h-screen flex items-center justify-center">
-      <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+      </div>
     </div>
-  </div>
+  `;
+}
+
+function renderDashboard() {
+  const stats = calcStats();
+  const lvl = getLevel(userData.xp);
+  const streak = countStreak(userData.streak || []);
+  const recommendations = getCoachRecommendations();
+
+  document.getElementById("root").innerHTML = `
+    <div style="max-width:1100px;margin:0 auto;padding:24px 16px;">
+      <!-- TOP NAV -->
+      <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:16px;">
+        <div>
+          <h1 style="font-size:1.5rem;font-weight:800;color:var(--accent);">YKSKoç Panel</h1>
+          <p style="font-size:0.85rem;color:var(--text2);">Hoş geldin, ${userData.name || 'Öğrenci'}</p>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <button onclick="window.toggleTheme()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;cursor:pointer;">🌓</button>
+          <button onclick="window.doLogout()" style="background:#ff4757;border:none;color:#fff;padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer;">Çıkış</button>
+        </div>
+      </header>
+
+      <!-- COUNTER & TIMER HEADER -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;">
+        <div style="background:var(--bg2);border:1px solid var(--border);padding:16px;border-radius:12px;">
+          <div style="font-size:0.8rem;color:var(--text2);">TYT KALAN ZAMAN</div>
+          <div style="font-size:1.4rem;font-weight:700;color:var(--accent);">${daysTo(TYT_DATE)} Gün</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);padding:16px;border-radius:12px;">
+          <div style="font-size:0.8rem;color:var(--text2);">AYT KALAN ZAMAN</div>
+          <div style="font-size:1.4rem;font-weight:700;color:var(--accent2);">${daysTo(AYT_DATE)} Gün</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);padding:16px;border-radius:12px;">
+          <div style="font-size:0.8rem;color:var(--text2);">MEVCUT SERİ</div>
+          <div style="font-size:1.4rem;font-weight:700;color:#ffd60a;">🔥 ${streak} Gün</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);padding:16px;border-radius:12px;">
+          <div style="font-size:0.8rem;color:var(--text2);">SEVİYE / XP</div>
+          <div style="font-size:1.1rem;font-weight:700;color:#2ed573;">${lvl.lvl.name} (${userData.xp} XP)</div>
+        </div>
+      </div>
+
+      <!-- TIMER SECTION -->
+      <div style="background:var(--bg2);border:1px solid var(--border);padding:20px;border-radius:12px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span id="timerDot" style="width:10px;height:10px;border-radius:50%;background:#2ed573;display:inline-block;"></span>
+            <span style="font-weight:700;font-size:0.9rem;">Çalışma Zamanlayıcısı</span>
+          </div>
+          <div id="timerDisplay" style="font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:600;margin-top:4px;">${fmtTime(timerCurrentSec())}</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button id="timerBtn" onclick="window.timerStartStop()" style="background:${timerRunning ? '#ff4757' : '#2ed573'};border:none;color:#000;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer;">
+            ${timerRunning ? '⏸ Durdur' : '▶ Başlat'}
+          </button>
+          <button onclick="window.timerReset()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 16px;border-radius:8px;cursor:pointer;">Sıfırla</button>
+        </div>
+      </div>
+
+      <!-- AI / COACH RECOMMENDATIONS -->
+      <div style="background:var(--bg2);border:1px solid var(--border);padding:20px;border-radius:12px;margin-bottom:24px;">
+        <h3 style="font-size:1rem;margin-bottom:12px;color:var(--accent);">🤖 Koç Tavsiyesi</h3>
+        <ul style="padding-left:20px;font-size:0.9rem;color:var(--text3);line-height:1.6;">
+          ${recommendations.map(rec => `<li style="margin-bottom:6px;">${rec}</li>`).join('')}
+        </ul>
+      </div>
+
+      <!-- SUBJECT TABS -->
+      <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;">
+        ${Object.keys(SUBJECTS).map(s => `
+          <button class="subTab" data-s="${s}" onclick="window.setSubject('${s}')" style="
+            padding:8px 16px;
+            border-radius:8px;
+            border:1px solid ${s === activeSub ? SUBJECTS[s].color : 'var(--border)'};
+            background:${s === activeSub ? SUBJECTS[s].color : 'transparent'};
+            color:${s === activeSub ? '#000' : 'var(--text2)'};
+            font-weight:${s === activeSub ? '700' : '400'};
+            white-space:nowrap;
+            cursor:pointer;
+          ">
+            ${SUBJECTS[s].label}
+          </button>
+        `).join('')}
+      </div>
+
+      <!-- TOPICS CONTENT -->
+      <div id="topicsContainer"></div>
+    </div>
+  `;
+
+  renderTopics();
+}
+
+function render() {
+  if (activePage === "auth") {
+    renderAuth();
+  } else {
+    renderDashboard();
+  }
+}
+
+// ── GLOBAL EXPORTS ────────────────────────────────────────────
+window.doRegister = doRegister;
+window.doLogin = doLogin;
+window.doForgotPassword = doForgotPassword;
+window.doLogout = doLogout;
+window.toggleTopic = toggleTopic;
+window.setSubject = setSubject;
+window.timerStartStop = timerStartStop;
+window.timerReset = timerReset;
+window.toggleAuthMode = () => { authMode = authMode === "register" ? "login" : "register"; renderAuth(); };
+window.toggleTheme = () => {
+  isDark = !isDark;
+  document.body.classList.toggle("light", !isDark);
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+};
+
+// Event listener for reward overlay button
+document.getElementById("rewardBtn")?.addEventListener("click", closeReward);
+</script>
 </body>
 </html>
+    

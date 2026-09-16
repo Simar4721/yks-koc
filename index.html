@@ -57,7 +57,6 @@
       unsubscribeFirestore: null
     };
 
-    // State Güncelleme ve UI Senkronizasyonu
     function setState(newState) {
       Object.assign(AppState, newState);
       renderUI();
@@ -68,7 +67,6 @@
       if (!user) return;
       const userDocRef = doc(db, "users", user.uid);
 
-      // Eski dinleyici varsa temizle (Çift tetiklemeyi önler)
       if (AppState.unsubscribeFirestore) {
         AppState.unsubscribeFirestore();
       }
@@ -76,11 +74,9 @@
       try {
         const docSnap = await getDoc(userDocRef);
         if (!docSnap.exists()) {
-          // Yeni kullanıcı varsayılan verileri
           await setDoc(userDocRef, AppState.userData);
         }
 
-        // Anlık Veri Dinleyicisi
         const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
           if (snapshot.exists()) {
             AppState.userData = snapshot.data();
@@ -194,16 +190,13 @@
     function renderUI() {
       const appDiv = document.getElementById("app");
 
+      // Orijinal Basit Giriş Ekranı
       if (!AppState.user) {
         appDiv.innerHTML = `
-          <div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-            <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
-              <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
-                <i class="fa-solid fa-graduation-cap"></i>
-              </div>
-              <h1 class="text-2xl font-bold text-gray-800 mb-2">YKS Koçum'a Hoş Geldiniz</h1>
-              <p class="text-gray-600 mb-6 text-sm">Hedeflerinize giden yolda çalışma takibinizi ve deneme netlerinizi tek noktadan yönetin.</p>
-              <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
+          <div class="min-h-screen flex items-center justify-center bg-gray-100">
+            <div class="bg-white p-8 rounded-lg shadow-md text-center max-w-sm w-full">
+              <h1 class="text-2xl font-bold mb-4">YKSKoç Giriş</h1>
+              <button onclick="handleLogin()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full flex items-center justify-center gap-2">
                 <i class="fa-brands fa-google"></i> Google ile Giriş Yap
               </button>
             </div>
@@ -363,7 +356,6 @@
 </head>
 <body class="bg-gray-50 font-sans antialiased">
   <div id="app">
-    <!-- Sayfa Yüklenme Durumu -->
     <div class="min-h-screen flex items-center justify-center">
       <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
     </div>

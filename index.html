@@ -274,7 +274,7 @@
             gap: 10px;
         }
 
-        .ai-input-box input {
+        .ai-input-box input, .form-control {
             flex: 1;
             background: var(--bg-color);
             border: 1px solid var(--card-border);
@@ -285,7 +285,7 @@
             font-size: 14px;
         }
 
-        .ai-input-box input:focus {
+        .ai-input-box input:focus, .form-control:focus {
             border-color: var(--primary);
         }
 
@@ -328,6 +328,25 @@
             border-color: var(--primary);
         }
 
+        /* Tracker Table */
+        .exam-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .exam-table th, .exam-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 14px;
+        }
+
+        .exam-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
         /* Responsive */
         @media(max-width: 1024px) {
             .grid-2 {
@@ -350,11 +369,11 @@
             <h1>YKSKoç 2027</h1>
         </div>
         <ul class="nav-links">
-            <li><a href="#" class="active" onclick="switchView('dashboard', this)"><i class="fa-solid fa-house"></i> Panel</a></li>
-            <li><a href="#" onclick="switchView('aikoach', this)"><i class="fa-solid fa-robot"></i> Yapay Zeka Koç</a></li>
-            <li><a href="#" onclick="switchView('tracker', this)"><i class="fa-solid fa-chart-line"></i> Net Takip & Deneme</a></li>
-            <li><a href="#" onclick="switchView('pomodoro', this)"><i class="fa-solid fa-stopwatch"></i> Kronometre</a></li>
-            <li><a href="#" onclick="switchView('settings', this)"><i class="fa-solid fa-gear"></i> Ayarlar</a></li>
+            <li><a href="#" class="active" onclick="switchView('dashboard', this, event)"><i class="fa-solid fa-house"></i> Panel</a></li>
+            <li><a href="#" onclick="switchView('aikoach', this, event)"><i class="fa-solid fa-robot"></i> Yapay Zeka Koç</a></li>
+            <li><a href="#" onclick="switchView('tracker', this, event)"><i class="fa-solid fa-chart-line"></i> Net Takip & Deneme</a></li>
+            <li><a href="#" onclick="switchView('pomodoro', this, event)"><i class="fa-solid fa-stopwatch"></i> Kronometre</a></li>
+            <li><a href="#" onclick="switchView('settings', this, event)"><i class="fa-solid fa-gear"></i> Ayarlar</a></li>
         </ul>
     </aside>
 
@@ -451,11 +470,27 @@
         <section id="tracker" class="view-section">
             <div class="card">
                 <div class="card-title"><i class="fa-solid fa-chart-line"></i> Deneme Sınavı Takip Tablosu</div>
-                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Çözdüğün deneme sonuçlarını kaydederek gelişimini grafiklerle takip et.</p>
-                <div style="background: var(--bg-color); padding: 30px; border-radius: 12px; text-align: center; border: 1px dashed var(--card-border);">
-                    <i class="fa-solid fa-folder-open" style="font-size: 40px; color: var(--text-muted); margin-bottom: 10px;"></i>
-                    <p style="color: var(--text-muted);">Henüz kaydedilmiş deneme sınavı bulunmuyor. Yakında detaylı grafik modülü aktif olacaktır.</p>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Çözdüğün deneme sonuçlarını kaydederek gelişimini takip et.</p>
+                
+                <!-- Deneme Ekle Formu -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <input type="text" id="examName" class="form-control" placeholder="Deneme Adı (Örn: Yayın Deneme-1)" style="min-width: 200px;">
+                    <input type="number" id="examNet" class="form-control" placeholder="Toplam Net" style="max-width: 150px;">
+                    <button class="btn" onclick="addExamRecord()"><i class="fa-solid fa-plus"></i> Kaydet</button>
                 </div>
+
+                <table class="exam-table">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>Deneme Adı</th>
+                            <th>Toplam Net</th>
+                        </tr>
+                    </thead>
+                    <tbody id="examTableBody">
+                        <!-- Kayıtlar buraya gelecek -->
+                    </tbody>
+                </table>
             </div>
         </section>
 
@@ -465,8 +500,8 @@
                 <div class="card-title" style="justify-content: center;"><i class="fa-solid fa-stopwatch"></i> Odaklanma Kronometresi</div>
                 <div style="font-size: 64px; font-weight: 800; margin: 30px 0; font-family: monospace; color: var(--primary);" id="pomodoroTimer">25:00</div>
                 <div style="display: flex; justify-content: center; gap: 15px;">
-                    <button class="btn" onclick="alert('Kronometre başlatıldı!')"><i class="fa-solid fa-play"></i> Başlat</button>
-                    <button class="btn" style="background: var(--card-border);" onclick="alert('Sıfırlandı')"><i class="fa-solid fa-rotate-right"></i> Sıfırla</button>
+                    <button class="btn" id="pomoStartBtn" onclick="togglePomodoro()"><i class="fa-solid fa-play"></i> Başlat</button>
+                    <button class="btn" style="background: var(--card-border);" onclick="resetPomodoro()"><i class="fa-solid fa-rotate-right"></i> Sıfırla</button>
                 </div>
             </div>
         </section>
@@ -475,7 +510,13 @@
         <section id="settings" class="view-section">
             <div class="card">
                 <div class="card-title"><i class="fa-solid fa-gear"></i> Hesap ve Sınav Ayarları</div>
-                <p style="color: var(--text-muted); font-size: 14px;">Hedef Alan: <strong>Sayısal / Eşit Ağırlık / Sözel (YKS 2027)</strong></p>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Hedef Alanınızı Seçin:</p>
+                <select class="form-control" style="max-width: 300px;">
+                    <option>Sayısal (YKS 2027)</option>
+                    <option>Eşit Ağırlık (YKS 2027)</option>
+                    <option>Sözel (YKS 2027)</option>
+                    <option>Yabancı Dil (YKS 2027)</option>
+                </select>
             </div>
         </section>
     </main>
@@ -483,7 +524,8 @@
     <!-- JavaScript Kodları -->
     <script>
         // 1. Sekme Değiştirme Fonksiyonu
-        function switchView(viewId, element) {
+        function switchView(viewId, element, event) {
+            if (event) event.preventDefault();
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
             
@@ -565,6 +607,72 @@
             } else {
                 return "Harika bir soru! YKS 2027 hazırlığında süre çok uzun gözükse de hızla akıp gidecek. Temel kavramları sıkı tutarak ve eksik konularını kapatarak ilerle. Sana bu yolda rehberlik etmek için buradayım!";
             }
+        }
+
+        // 4. Çalışan Pomodoro Mantığı
+        let pomoInterval;
+        let pomoSeconds = 1500; // 25 dakika
+        let isPomoRunning = false;
+
+        function updatePomoDisplay() {
+            const m = Math.floor(pomoSeconds / 60);
+            const s = pomoSeconds % 60;
+            document.getElementById('pomodoroTimer').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function togglePomodoro() {
+            const btn = document.getElementById('pomoStartBtn');
+            if (isPomoRunning) {
+                clearInterval(pomoInterval);
+                isPomoRunning = false;
+                btn.innerHTML = `<i class="fa-solid fa-play"></i> Başlat`;
+            } else {
+                isPomoRunning = true;
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> Durdur`;
+                pomoInterval = setInterval(() => {
+                    if (pomoSeconds > 0) {
+                        pomoSeconds--;
+                        updatePomoDisplay();
+                    } else {
+                        clearInterval(pomoInterval);
+                        alert("Pomodoro Süresi Doldu! Mola Verme Zamanı.");
+                        resetPomodoro();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetPomodoro() {
+            clearInterval(pomoInterval);
+            isPomoRunning = false;
+            pomoSeconds = 1500;
+            updatePomoDisplay();
+            document.getElementById('pomoStartBtn').innerHTML = `<i class="fa-solid fa-play"></i> Başlat`;
+        }
+
+        // 5. Deneme Kaydetme Mantığı
+        function addExamRecord() {
+            const nameInput = document.getElementById('examName');
+            const netInput = document.getElementById('examNet');
+            
+            if (!nameInput.value || !netInput.value) {
+                alert("Lütfen tüm alanları doldurun!");
+                return;
+            }
+
+            const tbody = document.getElementById('examTableBody');
+            const dateStr = new Date().toLocaleDateString('tr-TR');
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${dateStr}</td>
+                <td>${nameInput.value}</td>
+                <td><strong style="color: var(--primary);">${netInput.value} Net</strong></td>
+            `;
+
+            tbody.appendChild(tr);
+            nameInput.value = '';
+            netInput.value = '';
         }
     </script>
 </body>

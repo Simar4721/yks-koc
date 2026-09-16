@@ -1,780 +1,372 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YKSKoç 2027 - Gamified Study & Progress Panel</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --card-border: #334155;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #ec4899;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --sidebar-width: 260px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YKS Koçum - YKS Hazırlık Ve Takip Asistanı</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase SDK Modular Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged, 
+      signInWithPopup, 
+      GoogleAuthProvider, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc, 
+      getDoc, 
+      onSnapshot, 
+      updateDoc 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // --- Firebase Konfigürasyonu ---
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // --- Uygulama State Yönetimi ---
+    const AppState = {
+      user: null,
+      userData: {
+        targetUniversity: "",
+        targetDepartment: "",
+        examType: "TYT-AYT",
+        todos: [],
+        examResults: [],
+        notes: ""
+      },
+      activeTab: "dashboard",
+      unsubscribeFirestore: null
+    };
+
+    // State Güncelleme ve UI Senkronizasyonu
+    function setState(newState) {
+      Object.assign(AppState, newState);
+      renderUI();
+    }
+
+    // --- Veritabanı İşlemleri ---
+    async function initUserFirestore(user) {
+      if (!user) return;
+      const userDocRef = doc(db, "users", user.uid);
+
+      // Eski dinleyici varsa temizle (Çift tetiklemeyi önler)
+      if (AppState.unsubscribeFirestore) {
+        AppState.unsubscribeFirestore();
+      }
+
+      try {
+        const docSnap = await getDoc(userDocRef);
+        if (!docSnap.exists()) {
+          // Yeni kullanıcı varsayılan verileri
+          await setDoc(userDocRef, AppState.userData);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+        // Anlık Veri Dinleyicisi
+        const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
+          if (snapshot.exists()) {
+            AppState.userData = snapshot.data();
+            renderUI();
+          }
+        }, (error) => {
+          console.error("Firestore dinleme hatası:", error);
+        });
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+        AppState.unsubscribeFirestore = unsubscribe;
+      } catch (error) {
+        console.error("Veritabanı başlatma hatası:", error);
+      }
+    }
 
-        /* Sidebar */
-        aside {
-            width: var(--sidebar-width);
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--card-border);
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
-            z-index: 100;
-        }
+    async function syncToFirestore() {
+      if (!AppState.user) return;
+      try {
+        const userDocRef = doc(db, "users", AppState.user.uid);
+        await updateDoc(userDocRef, AppState.userData);
+      } catch (error) {
+        console.error("Veri senkronizasyon hatası:", error);
+      }
+    }
 
-        .logo-area {
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid var(--card-border);
-        }
+    // --- Auth İşlemleri ---
+    window.handleLogin = async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        alert("Giriş yapılırken bir hata oluştu: " + error.message);
+      }
+    };
 
-        .logo-area i {
-            font-size: 28px;
-            color: var(--primary);
+    window.handleLogout = async () => {
+      try {
+        if (AppState.unsubscribeFirestore) {
+          AppState.unsubscribeFirestore();
         }
+        await signOut(auth);
+        setState({
+          user: null,
+          userData: { targetUniversity: "", targetDepartment: "", examType: "TYT-AYT", todos: [], examResults: [], notes: "" },
+          unsubscribeFirestore: null
+        });
+      } catch (error) {
+        alert("Çıkış yapılırken bir hata oluştu: " + error.message);
+      }
+    };
 
-        .logo-area h1 {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(to right, #6366f1, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    // Auth Durum Dinleyicisi
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        AppState.user = user;
+        await initUserFirestore(user);
+      } else {
+        AppState.user = null;
+      }
+      renderUI();
+    });
 
-        .nav-links {
-            list-style: none;
-            padding: 20px 12px;
-            flex: 1;
-        }
+    // --- İş Mantığı (Actions) ---
+    window.switchTab = (tabName) => {
+      AppState.activeTab = tabName;
+      renderUI();
+    };
 
-        .nav-links li {
-            margin-bottom: 8px;
-        }
+    window.addTodo = async (event) => {
+      event.preventDefault();
+      const input = document.getElementById("todo-input");
+      const text = input.value.trim();
+      if (!text) return;
 
-        .nav-links a {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
+      const newTodo = { id: Date.now(), text, completed: false };
+      AppState.userData.todos.push(newTodo);
+      input.value = "";
+      
+      renderUI();
+      await syncToFirestore();
+    };
 
-        .nav-links a:hover, .nav-links a.active {
-            background-color: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-        }
+    window.toggleTodo = async (id) => {
+      AppState.userData.todos = AppState.userData.todos.map(t => 
+        t.id === id ? { ...t, completed: !t.completed } : t
+      );
+      renderUI();
+      await syncToFirestore();
+    };
 
-        .nav-links a i {
-            font-size: 18px;
-        }
+    window.deleteTodo = async (id) => {
+      AppState.userData.todos = AppState.userData.todos.filter(t => t.id !== id);
+      renderUI();
+      await syncToFirestore();
+    };
 
-        /* Main Content */
-        main {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            padding: 30px;
-            max-width: calc(100vw - var(--sidebar-width));
-        }
+    window.addExamResult = async (event) => {
+      event.preventDefault();
+      const name = document.getElementById("exam-name").value;
+      const net = parseFloat(document.getElementById("exam-net").value);
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: var(--card-bg);
-            padding: 20px 30px;
-            border-radius: 16px;
-            border: 1px solid var(--card-border);
-        }
+      if (!name || isNaN(net)) return;
 
-        .welcome-box h2 {
-            font-size: 24px;
-            font-weight: 700;
-        }
+      AppState.userData.examResults.push({ id: Date.now(), name, net, date: new Date().toLocaleDateString("tr-TR") });
+      document.getElementById("exam-form").reset();
 
-        .welcome-box p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 4px;
-        }
+      renderUI();
+      await syncToFirestore();
+    };
 
-        /* Gamification XP Box */
-        .xp-badge-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid var(--primary);
-            padding: 10px 20px;
-            border-radius: 12px;
-        }
+    // --- UI Render İşlemleri ---
+    function renderUI() {
+      const appDiv = document.getElementById("app");
 
-        .xp-badge-container i {
-            font-size: 24px;
-            color: var(--warning);
-        }
+      if (!AppState.user) {
+        appDiv.innerHTML = `
+          <div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+            <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+              <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-graduation-cap"></i>
+              </div>
+              <h1 class="text-2xl font-bold text-gray-800 mb-2">YKS Koçum'a Hoş Geldiniz</h1>
+              <p class="text-gray-600 mb-6 text-sm">Hedeflerinize giden yolda çalışma takibinizi ve deneme netlerinizi tek noktadan yönetin.</p>
+              <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fa-brands fa-google"></i> Google ile Giriş Yap
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
 
-        .xp-text span {
-            display: block;
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 700;
-        }
+      appDiv.innerHTML = `
+        <div class="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+          <!-- Sol Sidebar -->
+          <aside class="w-full md:w-64 bg-slate-900 text-white p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-3 mb-8">
+                <i class="fa-solid fa-graduation-cap text-2xl text-blue-400"></i>
+                <span class="font-bold text-xl tracking-wide">YKS Koçum</span>
+              </div>
+              <nav class="space-y-2">
+                <button onclick="switchTab('dashboard')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${AppState.activeTab === 'dashboard' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}">
+                  <i class="fa-solid fa-chart-line"></i> Genel Bakış
+                </button>
+                <button onclick="switchTab('todos')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${AppState.activeTab === 'todos' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}">
+                  <i class="fa-solid fa-list-check"></i> Görevlerim
+                </button>
+                <button onclick="switchTab('exams')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${AppState.activeTab === 'exams' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800'}">
+                  <i class="fa-solid fa-pen-ruler"></i> Deneme Takibi
+                </button>
+              </nav>
+            </div>
+            
+            <div class="pt-6 border-t border-slate-800 flex items-center justify-between">
+              <div class="flex items-center gap-3 overflow-hidden">
+                <img src="${AppState.user.photoURL || 'https://via.placeholder.com/40'}" class="w-9 h-9 rounded-full object-cover" alt="Profil">
+                <div class="truncate">
+                  <p class="text-sm font-medium text-white truncate">${AppState.user.displayName}</p>
+                  <p class="text-xs text-slate-400 truncate">${AppState.user.email}</p>
+                </div>
+              </div>
+              <button onclick="handleLogout()" title="Çıkış Yap" class="text-slate-400 hover:text-red-400 p-2 transition">
+                <i class="fa-solid fa-right-from-bracket"></i>
+              </button>
+            </div>
+          </aside>
 
-        .xp-text strong {
-            font-size: 18px;
-            color: var(--text-main);
-        }
+          <!-- Ana İçerik Alanı -->
+          <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+            ${renderMainContent()}
+          </main>
+        </div>
+      `;
 
-        /* Countdown Banner */
-        .countdown-banner {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
-            border-radius: 16px;
-            padding: 25px 35px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
-        }
+      if (AppState.activeTab === 'exams') {
+        renderChart();
+      }
+    }
 
-        .countdown-info h3 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
+    function renderMainContent() {
+      if (AppState.activeTab === 'dashboard') {
+        const completedCount = AppState.userData.todos.filter(t => t.completed).length;
+        const totalCount = AppState.userData.todos.length;
 
-        .countdown-info p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
+        return `
+          <div class="max-w-4xl space-y-6">
+            <h2 class="text-2xl font-bold text-gray-800">Hoş Geldin, ${AppState.user.displayName} 👋</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-sm text-gray-500 mb-1">Tamamlanan Görevler</p>
+                <p class="text-3xl font-bold text-gray-800">${completedCount} / ${totalCount}</p>
+              </div>
+              <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-sm text-gray-500 mb-1">Girilen Deneme</p>
+                <p class="text-3xl font-bold text-gray-800">${AppState.userData.examResults.length}</p>
+              </div>
+              <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-sm text-gray-500 mb-1">Hedef Bölüm</p>
+                <p class="text-xl font-bold text-blue-600 truncate">${AppState.userData.targetDepartment || 'Henüz Belirtilmedi'}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
 
-        .timers {
-            display: flex;
-            gap: 15px;
-        }
+      if (AppState.activeTab === 'todos') {
+        return `
+          <div class="max-w-2xl space-y-6">
+            <h2 class="text-2xl font-bold text-gray-800">Çalışma Listesi</h2>
+            <form onsubmit="addTodo(event)" class="flex gap-2">
+              <input type="text" id="todo-input" placeholder="Yeni çalışma görevi ekle..." required class="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition">Ekle</button>
+            </form>
 
-        .timer-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(8px);
-            padding: 12px 18px;
-            border-radius: 12px;
-            text-align: center;
-            min-width: 75px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y">
+              ${AppState.userData.todos.length === 0 ? '<p class="p-4 text-center text-gray-400">Henüz eklenmiş bir görev bulunmuyor.</p>' : ''}
+              ${AppState.userData.todos.map(todo => `
+                <div class="p-4 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo(${todo.id})" class="w-5 h-5 accent-blue-600 rounded cursor-pointer">
+                    <span class="${todo.completed ? 'line-through text-gray-400' : 'text-gray-700'}">${todo.text}</span>
+                  </div>
+                  <button onclick="deleteTodo(${todo.id})" class="text-red-500 hover:text-red-700 text-sm">Sil</button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
 
-        .timer-card span {
-            display: block;
-            font-size: 22px;
-            font-weight: 800;
-        }
+      if (AppState.activeTab === 'exams') {
+        return `
+          <div class="max-w-3xl space-y-6">
+            <h2 class="text-2xl font-bold text-gray-800">Deneme Takibi</h2>
+            
+            <form id="exam-form" onsubmit="addExamResult(event)" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex gap-4">
+              <input type="text" id="exam-name" placeholder="Deneme Adı (Örn: Özdebir 1)" required class="flex-1 px-4 py-2 border rounded-xl">
+              <input type="number" step="0.25" id="exam-net" placeholder="Toplam Net" required class="w-32 px-4 py-2 border rounded-xl">
+              <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition">Kaydet</button>
+            </form>
 
-        .timer-card label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.8;
-        }
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+              <canvas id="examChart" class="max-h-80"></canvas>
+            </div>
+          </div>
+        `;
+      }
+    }
 
-        /* Views */
-        .view-section {
-            display: none;
-        }
+    function renderChart() {
+      const ctx = document.getElementById('examChart');
+      if (!ctx) return;
 
-        .view-section.active {
-            display: block;
-            animation: fadeIn 0.4s ease;
-        }
+      const labels = AppState.userData.examResults.map(e => e.name);
+      const data = AppState.userData.examResults.map(e => e.net);
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Deneme Netleri',
+            data,
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          }
         }
-
-        /* Grid Layouts */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 25px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 25px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-title i {
-            color: var(--primary);
-        }
-
-        /* Curriculum & Topics Styles */
-        .exam-toggle-btns {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .toggle-btn {
-            padding: 10px 24px;
-            border-radius: 8px;
-            background: var(--bg-color);
-            color: var(--text-muted);
-            border: 1px solid var(--card-border);
-            cursor: pointer;
-            font-weight: 700;
-            transition: all 0.2s;
-        }
-
-        .toggle-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .accordion-item {
-            background: var(--bg-color);
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            margin-bottom: 12px;
-            overflow: hidden;
-        }
-
-        .accordion-header {
-            padding: 16px 20px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .accordion-content {
-            padding: 0 20px 16px 20px;
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            border-top: 1px solid var(--card-border);
-            padding-top: 14px;
-        }
-
-        .accordion-item.open .accordion-content {
-            display: flex;
-        }
-
-        .topic-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--card-bg);
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 1px solid var(--card-border);
-        }
-
-        .topic-row label {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .topic-row input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--success);
-        }
-
-        .xp-tag {
-            font-size: 12px;
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: 700;
-        }
-
-        /* AI Coach Section Styles */
-        .ai-chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 450px;
-        }
-
-        .ai-chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .ai-msg {
-            padding: 14px 18px;
-            border-radius: 14px;
-            max-width: 80%;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .ai-msg.bot {
-            background: rgba(99, 102, 241, 0.15);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-
-        .ai-msg.user {
-            background: var(--primary);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-
-        .ai-input-box {
-            display: flex;
-            gap: 10px;
-        }
-
-        .ai-input-box input, .form-control {
-            flex: 1;
-            background: var(--bg-color);
-            border: 1px solid var(--card-border);
-            padding: 12px 18px;
-            border-radius: 10px;
-            color: white;
-            outline: none;
-            font-size: 14px;
-        }
-
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .btn:hover {
-            background: var(--primary-hover);
-        }
-
-        .prompt-chip {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            color: var(--text-muted);
-            transition: all 0.2s;
-        }
-
-        .prompt-chip:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Tracker Table */
-        .exam-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        .exam-table th, .exam-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--card-border);
-            font-size: 14px;
-        }
-
-        /* Responsive */
-        @media(max-width: 1024px) {
-            .grid-2 {
-                grid-template-columns: 1fr;
-            }
-            .countdown-banner {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-        }
-    </style>
+      });
+    }
+  </script>
 </head>
-<body>
-
-    <!-- Sidebar -->
-    <aside>
-        <div class="logo-area">
-            <i class="fa-solid fa-graduation-cap"></i>
-            <h1>YKSKoç 2027</h1>
-        </div>
-        <ul class="nav-links">
-            <li><a href="#" class="active" onclick="switchView('dashboard', this, event)"><i class="fa-solid fa-house"></i> Panel</a></li>
-            <li><a href="#" onclick="switchView('curriculum', this, event)"><i class="fa-solid fa-book-open"></i> Müfretat & Puan</a></li>
-            <li><a href="#" onclick="switchView('aikoach', this, event)"><i class="fa-solid fa-robot"></i> Yapay Zeka Koç</a></li>
-            <li><a href="#" onclick="switchView('tracker', this, event)"><i class="fa-solid fa-chart-line"></i> Net Takip & Deneme</a></li>
-            <li><a href="#" onclick="switchView('pomodoro', this, event)"><i class="fa-solid fa-stopwatch"></i> Kronometre</a></li>
-            <li><a href="#" onclick="switchView('settings', this, event)"><i class="fa-solid fa-gear"></i> Ayarlar</a></li>
-        </ul>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main>
-        <header>
-            <div class="welcome-box">
-                <h2>Hedef: YKS 2027 🚀</h2>
-                <p>Bugün harika bir çalışma günü olsun. Planına sadık kal!</p>
-            </div>
-
-            <!-- XP Gamification Badge -->
-            <div class="xp-badge-container">
-                <i class="fa-solid fa-trophy"></i>
-                <div class="xp-text">
-                    <span id="userLevel">SEVİYE 1 (ÇAYLAK)</span>
-                    <strong id="userXP">0 XP</strong>
-                </div>
-            </div>
-
-            <div class="user-profile" style="display: flex; align-items: center; gap: 10px;">
-                <i class="fa-solid fa-circle-user" style="font-size: 32px; color: var(--primary);"></i>
-                <div>
-                    <h4 style="font-size: 14px; font-weight: 700;">Öğrenci Paneli</h4>
-                    <span style="font-size: 12px; color: var(--success);">● Çevrimiçi Koçluk</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Countdown Banner -->
-        <div class="countdown-banner">
-            <div class="countdown-info">
-                <h3>YKS 2027 (TYT) İçin Geri Sayım</h3>
-                <p>19 Haziran 2027 Cumartesi sınav saatine kalan net süre</p>
-            </div>
-            <div class="timers">
-                <div class="timer-card"><span id="days">00</span><label>Gün</label></div>
-                <div class="timer-card"><span id="hours">00</span><label>Saat</label></div>
-                <div class="timer-card"><span id="mins">00</span><label>Dakika</label></div>
-                <div class="timer-card"><span id="secs">00</span><label>Saniye</label></div>
-            </div>
-        </div>
-
-        <!-- DASHBOARD VIEW -->
-        <section id="dashboard" class="view-section active">
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-title"><i class="fa-solid fa-bolt"></i> Günlük Çalışma Özeti</div>
-                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Bugünkü görevlerini tamamlayarak hedefine bir adım daha yaklaş.</p>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <label style="display: flex; align-items: center; gap: 10px; background: var(--bg-color); padding: 12px; border-radius: 10px; border: 1px solid var(--card-border); cursor: pointer;">
-                            <input type="checkbox" style="width: 18px; height: 18px; accent-color: var(--primary);"> 
-                            <span>TYT Türkçe Paragraf (30 Soru)</span>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 10px; background: var(--bg-color); padding: 12px; border-radius: 10px; border: 1px solid var(--card-border); cursor: pointer;">
-                            <input type="checkbox" style="width: 18px; height: 18px; accent-color: var(--primary);"> 
-                            <span>Matematik Fonksiyonlar Tekrarı</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title"><i class="fa-solid fa-fire"></i> Motivasyon Kutusu</div>
-                    <blockquote style="font-style: italic; color: var(--text-muted); font-size: 14px; line-height: 1.6; border-left: 3px solid var(--primary); padding-left: 15px; margin-top: 15px;">
-                        "Başarı, küçük çabaların her gün tekrar tekrar tekrarlanmasıyla oluşur." 
-                        <br><strong style="color: var(--text-main); display: block; margin-top: 8px;">— Robert Collier</strong>
-                    </blockquote>
-                </div>
-            </div>
-        </section>
-
-        <!-- CURRICULUM VIEW (TYT/AYT & GAMIFICATION) -->
-        <section id="curriculum" class="view-section">
-            <div class="card">
-                <div class="card-title"><i class="fa-solid fa-book-open"></i> Ders & Konu Takip Sistemi</div>
-                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Bitirdiğin her konu sana **+50 XP** kazandırır!</p>
-                
-                <div class="exam-toggle-btns">
-                    <button class="toggle-btn active" onclick="switchExamType('TYT', this)">TYT Konuları</button>
-                    <button class="toggle-btn" onclick="switchExamType('AYT', this)">AYT Konuları</button>
-                </div>
-
-                <!-- Subjects Accordion Area -->
-                <div id="curriculumContainer">
-                    <!-- Dynamic Accordions injected via JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- AI COACH VIEW -->
-        <section id="aikoach" class="view-section">
-            <div class="card">
-                <div class="card-title"><i class="fa-solid fa-robot"></i> Yapay Zeka YKS Koçu</div>
-                <div class="ai-chat-container">
-                    <div class="ai-chat-messages" id="chatMessages">
-                        <div class="ai-msg bot">
-                            Merhaba! Ben senin YKS 2027 yapay zeka koçunum. Sana nasıl yardımcı olabilirim?
-                        </div>
-                    </div>
-                    <div class="ai-input-box">
-                        <input type="text" id="userInput" placeholder="Koçuna bir şey sor..." onkeypress="handleAIEnter(event)">
-                        <button class="btn" onclick="sendAIMessage()"><i class="fa-solid fa-paper-plane"></i> Gönder</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TRACKER VIEW -->
-        <section id="tracker" class="view-section">
-            <div class="card">
-                <div class="card-title"><i class="fa-solid fa-chart-line"></i> Deneme Sınavı Takip Tablosu</div>
-                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-                    <input type="text" id="examName" class="form-control" placeholder="Deneme Adı" style="min-width: 200px;">
-                    <input type="number" id="examNet" class="form-control" placeholder="Toplam Net" style="max-width: 150px;">
-                    <button class="btn" onclick="addExamRecord()"><i class="fa-solid fa-plus"></i> Kaydet</button>
-                </div>
-
-                <table class="exam-table">
-                    <thead>
-                        <tr>
-                            <th>Tarih</th>
-                            <th>Deneme Adı</th>
-                            <th>Toplam Net</th>
-                        </tr>
-                    </thead>
-                    <tbody id="examTableBody"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- POMODORO VIEW -->
-        <section id="pomodoro" class="view-section">
-            <div class="card" style="text-align: center; max-width: 500px; margin: 0 auto;">
-                <div class="card-title" style="justify-content: center;"><i class="fa-solid fa-stopwatch"></i> Odaklanma Kronometresi</div>
-                <div style="font-size: 64px; font-weight: 800; margin: 30px 0; font-family: monospace; color: var(--primary);" id="pomodoroTimer">25:00</div>
-                <div style="display: flex; justify-content: center; gap: 15px;">
-                    <button class="btn" id="pomoStartBtn" onclick="togglePomodoro()"><i class="fa-solid fa-play"></i> Başlat</button>
-                    <button class="btn" style="background: var(--card-border);" onclick="resetPomodoro()"><i class="fa-solid fa-rotate-right"></i> Sıfırla</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- SETTINGS VIEW -->
-        <section id="settings" class="view-section">
-            <div class="card">
-                <div class="card-title"><i class="fa-solid fa-gear"></i> Ayarlar</div>
-                <p style="color: var(--text-muted); font-size: 14px;">Hedef Alan: Sayısal (YKS 2027)</p>
-            </div>
-        </section>
-    </main>
-
-    <!-- JavaScript Kodları -->
-    <script>
-        // Müfredat Veri Yapısı
-        const curriculumData = {
-            TYT: [
-                {
-                    subject: "Matematik",
-                    topics: ["Temel Kavramlar", "Sayı Basamakları", "Bölme - Bölünebilme", "Rasyonel Sayılar", "Denklemler", "Üslü-Köklü İfadeler", "Problemler", "Fonksiyonlar"]
-                },
-                {
-                    subject: "Türkçe",
-                    topics: ["Sözcükte Anlam", "Cümlede Anlam", "Paragraf Bilgisi", "Yazım Kuralları", "Noktalama İşaretleri", "Dil Bilgisi"]
-                },
-                {
-                    subject: "Fizik",
-                    topics: ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Hareket ve Kuvvet", "İş, Güç ve Enerji", "Isı ve Sıcaklık", "Elektrik"]
-                },
-                {
-                    subject: "Kimya",
-                    topics: ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Halleri", "Asitler, Bazlar ve Tuzlar"]
-                }
-            ],
-            AYT: [
-                {
-                    subject: "Matematik",
-                    topics: ["Polinomlar", "2. Dereceden Denklemler", "Parabol", "Trigonometri", "Logaritma", "Diziler", "Limit", "Türev", "İntegral"]
-                },
-                {
-                    subject: "Fizik",
-                    topics: ["Vektörler", "Bağıl Hareket", "Newton'un Hareket Yasaları", "Atışlar", "İtme ve Momentum", "Çembersel Hareket"]
-                },
-                {
-                    subject: "Kimya",
-                    topics: ["Modern Atom Teorisi", "Gazlar", "Sıvı Çözeltiler", "Kimyasal Tepkimelerde Enerji", "Tepkime Hızları ve Denge", "Organik Kimya"]
-                },
-                {
-                    subject: "Biyoloji",
-                    topics: ["Sinir Sistemi", "Endokrin Sistem", "Duyu Organları", "Destek ve Hareket Sistemi", "Sindirim Sistemi", "Dolaşım Sistemi", "Genden Proteine"]
-                }
-            ]
-        };
-
-        let currentXP = parseInt(localStorage.getItem('userXP')) || 0;
-        let activeExamType = 'TYT';
-
-        // 1. Sekme Değiştirme
-        function switchView(viewId, element, event) {
-            if (event) event.preventDefault();
-            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
-            
-            document.getElementById(viewId).classList.add('active');
-            element.classList.add('active');
-        }
-
-        // 2. Müfredat Yükleme ve Akordiyon Yapısı
-        function renderCurriculum() {
-            const container = document.getElementById('curriculumContainer');
-            container.innerHTML = '';
-
-            const list = curriculumData[activeExamType];
-
-            list.forEach((item, index) => {
-                const accordion = document.createElement('div');
-                accordion.className = 'accordion-item';
-
-                let topicsHTML = '';
-                item.topics.forEach(top => {
-                    const topicKey = `${activeExamType}_${item.subject}_${top}`;
-                    const isChecked = localStorage.getItem(topicKey) === 'true';
-
-                    topicsHTML += `
-                        <div class="topic-row">
-                            <label>
-                                <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleTopic('${topicKey}', this)">
-                                <span>${top}</span>
-                            </label>
-                            <span class="xp-tag">+50 XP</span>
-                        </div>
-                    `;
-                });
-
-                accordion.innerHTML = `
-                    <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
-                        <span><i class="fa-solid fa-angle-right"></i> ${item.subject}</span>
-                        <span style="font-size: 12px; color: var(--text-muted);">${item.topics.length} Konu</span>
-                    </div>
-                    <div class="accordion-content">
-                        ${topicsHTML}
-                    </div>
-                `;
-
-                container.appendChild(accordion);
-            });
-        }
-
-        function switchExamType(type, btn) {
-            activeExamType = type;
-            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderCurriculum();
-        }
-
-        // 3. Puan ve Level Güncelleme
-        function toggleTopic(key, checkbox) {
-            if (checkbox.checked) {
-                localStorage.setItem(key, 'true');
-                currentXP += 50;
-            } else {
-                localStorage.setItem(key, 'false');
-                currentXP = Math.max(0, currentXP - 50);
-            }
-            
-            localStorage.setItem('userXP', currentXP);
-            updateXPUI();
-        }
-
-        function updateXPUI() {
-            document.getElementById('userXP').innerText = `${currentXP} XP`;
-            
-            let level = "SEVİYE 1 (ÇAYLAK)";
-            if (currentXP >= 1000) level = "SEVİYE 5 (YKS ÜSTADI)";
-            else if (currentXP >= 600) level = "SEVİYE 4 (SAVAŞÇI)";
-            else if (currentXP >= 300) level = "SEVİYE 3 (MÜCADELECİ)";
-            else if (currentXP >= 100) level = "SEVİYE 2 (ÇALIŞKAN)";
-
-            document.getElementById('userLevel').innerText = level;
-        }
-
-        // 4. Geri Sayım Sayacı
-        const targetDate = new Date('June 19, 2027 10:15:00').getTime();
-
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = targetDate - now;
-
-            if (distance < 0) return;
-
-            document.getElementById('days').innerText = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0');
-            document.getElementById('hours').innerText = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
-            document.getElementById('mins').innerText = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-            document.getElementById('secs').innerText = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
-        }
-
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
-
-        // Sayfa Yüklendiğinde Başlat
-        renderCurriculum();
-        updateXPUI();
-    </script>
+<body class="bg-gray-50 font-sans antialiased">
+  <div id="app">
+    <!-- Sayfa Yüklenme Durumu -->
+    <div class="min-h-screen flex items-center justify-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+    </div>
+  </div>
 </body>
 </html>

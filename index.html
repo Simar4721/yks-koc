@@ -36,30 +36,49 @@ body{
 ::-webkit-scrollbar{width:6px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
 
-.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-.btn { background: var(--accent); color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; }
-.input { width: 100%; background: var(--bg3); border: 1px solid var(--border2); padding: 12px; border-radius: 10px; color: var(--text); margin-bottom: 12px; }
-
+/* Modern Motivasyon Pop-Up */
 #motivationPopup {
   position: fixed; bottom: 24px; right: 24px; z-index: 900;
   max-width: 340px; width: calc(100% - 48px);
   background: var(--bg2); border: 1px solid var(--border2);
   border-radius: 16px; padding: 20px;
-  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); backdrop-filter: blur(12px); animation: popIn 0.4s ease;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3), 0 8px 10px -6px rgba(0,0,0,0.3);
+  backdrop-filter: blur(12px); animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex; flex-direction: column; gap: 10px;
 }
 #motivationPopup.hidden { display: none; }
 .popup-header { display: flex; justify-content: space-between; align-items: center; }
-.popup-title { font-size: 0.8rem; font-weight: 700; color: var(--accent); text-transform: uppercase; }
+.popup-title { font-size: 0.8rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
 .popup-close { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 1.1rem; }
+.popup-close:hover { color: var(--text); }
 .popup-body { font-size: 0.92rem; color: var(--text); line-height: 1.5; font-weight: 500; }
-.topic-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
-.topic-item:hover { background: var(--bg3); }
+
+/* Dashboard Stilleri */
+.container{max-width:1100px;margin:0 auto;padding:24px 16px 80px 16px;}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;background:var(--bg2);padding:16px 24px;border-radius:16px;border:1px solid var(--border);}
+.nav-tabs{display:flex;gap:8px;margin-bottom:24px;overflow-x:auto;padding-bottom:8px;}
+.tab-btn{background:var(--bg2);border:1px solid var(--border);color:var(--text2);padding:10px 18px;border-radius:12px;cursor:pointer;font-weight:600;white-space:nowrap;transition:all 0.2s;}
+.tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr;}}
+
+.topic-list{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
+.topic-card{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all 0.2s;}
+.topic-card:hover{border-color:var(--border2);transform:translateX(4px);}
+.topic-card.done{opacity:0.6;background:rgba(16,185,129,0.05);border-color:rgba(16,185,129,0.2);}
+.checkbox{width:20px;height:20px;border-radius:6px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;}
+.topic-card.done .checkbox{background:#10b981;border-color:#10b981;}
+
+.btn-primary{background:var(--accent);color:#fff;border:none;padding:12px 20px;border-radius:10px;font-weight:700;cursor:pointer;}
+.input-field{width:100%;background:var(--bg3);border:1px solid var(--border2);padding:12px;border-radius:10px;color:var(--text);margin-bottom:12px;outline:none;}
+.input-field:focus{border-color:var(--accent);}
 </style>
 </head>
 <body>
 <div id="root"></div>
 
+<!-- Motivasyon Pop-Up -->
 <div id="motivationPopup">
   <div class="popup-header">
     <span class="popup-title">⚡ Günün Motivasyonu</span>
@@ -68,13 +87,19 @@ body{
   <div class="popup-body" id="motivationText">...</div>
 </div>
 
-<div id="rewardOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity 0.3s;backdrop-filter:blur(8px);">
-  <div class="rbox" style="background:var(--bg2);border:1px solid #ffd60a;border-radius:24px;padding:40px;text-align:center;max-width:400px;width:90%;transform:scale(0.8);transition:transform 0.3s;">
+<div id="rewardOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);
+  display:flex;align-items:center;justify-content:center;z-index:1000;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;backdrop-filter:blur(8px);">
+  <div class="rbox" style="background:var(--bg2);border:1px solid #ffd60a;
+    border-radius:24px;padding:40px;text-align:center;max-width:400px;width:90%;
+    box-shadow:0 0 50px rgba(255,214,10,0.2);transform:scale(0.8);transition:transform 0.3s;">
     <div id="rEmoji" style="font-size:3.5rem;margin-bottom:12px;">🎉</div>
     <div id="rTitle" style="font-size:1.5rem;font-weight:800;color:#ffd60a;margin-bottom:8px;">HARİKA!</div>
     <div id="rText" style="color:var(--text2);font-size:0.95rem;line-height:1.6;margin-bottom:16px;"></div>
     <div id="rXP" style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;color:#2ed573;margin-bottom:24px;"></div>
-    <button id="rewardBtn" onclick="closeReward()" style="background:#ffd60a;border:none;color:#000;padding:12px 32px;border-radius:12px;font-weight:800;cursor:pointer;font-size:0.9rem;width:100%;">DEVAM ET 💪</button>
+    <button id="rewardBtn" onclick="closeReward()" style="background:#ffd60a;border:none;color:#000;
+      padding:12px 32px;border-radius:12px;font-weight:800;cursor:pointer;font-size:0.9rem;width:100%;">
+      DEVAM ET 💪</button>
   </div>
 </div>
 
@@ -114,10 +139,12 @@ function initMotivation(){
   const el = document.getElementById("motivationText");
   if(el) el.textContent = `"${quote}"`;
 }
-window.closeMotivation = function(){ document.getElementById("motivationPopup")?.classList.add("hidden"); };
+window.closeMotivation = function(){
+  document.getElementById("motivationPopup")?.classList.add("hidden");
+};
 window.closeReward = function(){
-  const el=document.getElementById("rewardOverlay");
-  el.style.opacity="0"; el.style.pointerEvents="none";
+  const el = document.getElementById("rewardOverlay");
+  el.style.opacity = "0"; el.style.pointerEvents = "none";
 };
 
 const SUBJECTS = {
@@ -134,22 +161,90 @@ const SUBJECTS = {
 };
 
 const TOPICS = {
-  "tyt-mat": ["Sayı Basamakları","Bölme & Bölünebilme","Asal Sayılar","Üslü Sayılar","Köklü Sayılar","Denklem Çözme","Kümeler","Fonksiyonlar","Problemler","Olasılık"],
-  "tyt-geo": ["Açılar","Üçgenler","Özel Üçgenler","Dörtgenler","Çokgenler","Çember & Daire","Katı Cisimler","Analitik Geometri"],
-  "tyt-fen": ["Fizik: Kuvvet & Hareket","Fizik: Optik","Kimya: Atom Yapısı","Kimya: Karışımlar","Biyoloji: Hücre","Biyoloji: Kalıtım"],
-  "tyt-turk": ["Sözcükte Anlam","Cümlede Anlam","Paragraf","Dil Bilgisi","Yazım Kuralları","Noktalama İşaretleri"],
-  "tyt-sos": ["Tarih: İlk Türk Devletleri","Tarih: Kurtuluş Savaşı","Coğrafya: İklim","Felsefe: Bilgi Felsefesi","Din Kültürü"],
-  "ayt-mat": ["Polinomlar","İkinci Dereceden Denklemler","Trigonometri","Logaritma","Diziler","Limit","Türev","İntegral"],
-  "ayt-geo": ["Üçgenler","Analitik Geometri","Çemberin Analitiği","Dönüşümler","Katı Cisimler"],
-  "ayt-fiz": ["Vektörler","Atışlar","İş Enerji","Elektrik Alan","Optik","Modern Fizik"],
-  "ayt-kim": ["Atom ve Kuantum","Gazlar","Çözeltiler","Kimyasal Denge","Elektrokimya","Organik Kimya"],
-  "ayt-bio": ["Nükleik Asitler","Protein Sentezi","Sistemler","Fotosentez","Hücresel Solunum","Ekoloji"]
+  "tyt-mat": [
+    "Sayı Basamakları","Bölme & Bölünebilme","Asal Sayılar & Asal Çarpanlara Ayırma",
+    "EBOB & EKOK","Tam Sayılar","Rasyonel Sayılar","Ondalıklı Sayılar",
+    "Üslü Sayılar","Köklü Sayılar","Oran & Orantı",
+    "Denklem Çözme (1. Derece)","Denklem Sistemleri",
+    "Eşitsizlikler","Mutlak Değer","Kümeler","Mantık","Fonksiyonlar (Temel)",
+    "Problemler: Yaş","Problemler: Hız & Yol","Problemler: Yüzde & Faiz",
+    "Sayma: Permütasyon & Kombinasyon","Olasılık (Temel)"
+  ],
+  "tyt-geo": [
+    "Temel Kavramlar & Açılar","Üçgenler: İç & Dış Açılar","Özel Üçgenler",
+    "Pisagor Teoremi","Dörtgenler & Paralelkenar","Çokgenler","Çember & Daire",
+    "Katı Cisimler","Koordinat Geometrisi"
+  ],
+  "tyt-fen": [
+    "Fizik: Ölçme & Birimler","Fizik: Kuvvet & Hareket","Fizik: Basınç","Fizik: Optik",
+    "Kimya: Atom Yapısı","Kimya: Karışımlar","Kimya: Asit & Baz",
+    "Biyoloji: Hücre Yapısı","Biyoloji: Kalıtım","Biyoloji: Ekosistem"
+  ],
+  "tyt-turk": [
+    "Sözcükte Anlam","Cümlede Anlam","Paragraf: Ana Düşünce",
+    "Dil Bilgisi: Yazım Kuralları","Dil Bilgisi: Noktalama İşaretleri","Ses Bilgisi"
+  ],
+  "tyt-sos": [
+    "Tarih: İlk Türk Devletleri","Tarih: Kurtuluş Savaşı","Coğrafya: İklim",
+    "Felsefe: Bilgi Felsefesi","Din Kültürü: Temel İbadetler"
+  ],
+  "ayt-mat": [
+    "İkinci Dereceden Denklemler","Polinomlar","Fonksiyonlar","Trigonometri",
+    "Logaritma","Diziler","Limit","Türev","İntegral","Karmaşık Sayılar"
+  ],
+  "ayt-geo": [
+    "Üçgenlerde Sinüs & Kosinüs Teoremi","Analitik Geometri","Çemberin Analitiği",
+    "Konikler: Parabol","Dönüşümler Geometrisi"
+  ],
+  "ayt-fiz": [
+    "Vektörler & Kuvvet","Kinematik & Atışlar","Momentum & İmpuls",
+    "Dairesel Hareket","Elektrik Alan & Potansiyel","Modern Fizik"
+  ],
+  "ayt-kim": [
+    "Kuantum Model & Atom","Gazlar","Çözeltiler","Kimyasal Denge",
+    "Elektrokimya","Organik Kimya"
+  ],
+  "ayt-bio": [
+    "Hücre Metabolizması","Fotosentez & Solunum","Protein Sentezi",
+    "İnsan Fizyolojisi (Sistemler)","Ekoloji"
+  ]
 };
+
+const LEVELS=[
+  {min:0,   name:"Çalışmaya Başladı", next:100},
+  {min:100, name:"Azimli Öğrenci",    next:250},
+  {min:250, name:"Kararlı Çalışan",   next:500},
+  {min:500, name:"Net Avcısı",        next:900},
+  {min:900, name:"YKS Savaşçısı",     next:1400},
+  {min:1400,name:"Zirve Adayı",       next:2000},
+  {min:2000,name:"Efsane Öğrenci",    next:99999},
+];
 
 let currentUser = null;
 let userData = { done:{}, xp:0, streak:[], name:"", studySeconds:{}, exams:[] };
 let activeSub = "tyt-mat";
 let authMode = "login";
+let saveTimeout = null;
+
+function calcStats(){
+  let tD=0,tT=0,aD=0,aT=0;
+  Object.entries(TOPICS).forEach(([s,topics])=>{
+    const isTyt=SUBJECTS[s].type==="tyt";
+    topics.forEach((_,i)=>{
+      if(isTyt){tT++; if(userData.done[s+":"+i])tD++;}
+      else{aT++; if(userData.done[s+":"+i])aD++;}
+    });
+  });
+  return{tD,tT,aD,aT,total:tD+aD,all:tT+aT};
+}
+
+function getLevel(xp){
+  let lvl=LEVELS[0],idx=0;
+  for(let i=LEVELS.length-1;i>=0;i--){ if(xp>=LEVELS[i].min){lvl=LEVELS[i];idx=i;break;} }
+  const next=LEVELS[Math.min(idx+1,LEVELS.length-1)];
+  const pct=idx===LEVELS.length-1?100:Math.round((xp-lvl.min)/(next.min-lvl.min)*100);
+  return{lvl,idx,next,pct};
+}
 
 async function loadUserData(uid){
   const ref = doc(db,"users",uid);
@@ -162,106 +257,219 @@ async function loadUserData(uid){
 }
 
 function scheduleSave(){
+  if(saveTimeout) clearTimeout(saveTimeout);
   const uid = currentUser?.uid;
-  if(!uid) return;
-  setDoc(doc(db,"users",uid), JSON.parse(JSON.stringify(userData)), {merge:true});
+  const snapshot = JSON.parse(JSON.stringify(userData));
+  saveTimeout = setTimeout(async ()=>{
+    if(!uid || !currentUser || currentUser.uid !== uid) return;
+    await setDoc(doc(db,"users",uid), snapshot, {merge:true});
+  }, 1000);
 }
 
 onAuthStateChanged(auth, async user=>{
   currentUser = user;
   if(user){
+    showLoading("Veriler yükleniyor...");
     await loadUserData(user.uid);
     initMotivation();
-    renderDashboard();
+    render();
   } else {
-    renderAuth();
+    render();
   }
 });
 
-function toggleTopic(subj, i){
-  const key = subj + ":" + i;
-  userData.done[key] = !userData.done[key];
-  if(userData.done[key]) userData.xp += SUBJECTS[subj].xp;
-  else userData.xp = Math.max(0, userData.xp - SUBJECTS[subj].xp);
-  scheduleSave();
-  renderDashboard();
+function launchConfetti(){
+  const colors=["#3b82f6","#f97316","#ffd60a","#10b981","#8b5cf6","#ec4899"];
+  for(let i=0;i<40;i++){
+    setTimeout(()=>{
+      const el=document.createElement("div");
+      const size=6+Math.random()*8;
+      el.style.cssText=`position:fixed;width:${size}px;height:${size}px;border-radius:2px;
+        left:${Math.random()*100}vw;top:-20px;z-index:9999;pointer-events:none;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        animation:cfFall ${2+Math.random()*2}s linear forwards;`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),3000);
+    },i*30);
+  }
 }
 
-window.setSub = function(s){
-  activeSub = s;
-  renderDashboard();
-};
+function showReward(emoji,title,text,xpAmt){
+  const el=document.getElementById("rewardOverlay");
+  document.getElementById("rEmoji").textContent=emoji;
+  document.getElementById("rTitle").textContent=title;
+  document.getElementById("rText").textContent=text;
+  document.getElementById("rXP").textContent=`+${xpAmt} XP kazandın! 🎯`;
+  el.style.opacity="1"; el.style.pointerEvents="all";
+  el.querySelector(".rbox").style.transform="scale(1)";
+  launchConfetti();
+}
 
-window.logout = function(){ signOut(auth); };
-
-function renderAuth(){
-  document.getElementById("root").innerHTML = `
-    <div style="max-width:400px;margin:80px auto;padding:24px;" class="card">
-      <h2 style="margin-bottom:20px;text-align:center;">YKSKoç Giriş</h2>
-      <div id="authErr" style="color:#ff4757;margin-bottom:10px;font-size:0.85rem;"></div>
-      ${authMode==='register'?'<input id="authName" class="input" placeholder="Ad Soyad" />':''}
-      <input id="authEmail" class="input" type="email" placeholder="E-posta" />
-      <input id="authPass" class="input" type="password" placeholder="Şifre" />
-      <button class="btn" style="width:100%;" onclick="${authMode==='register'?'doRegister()':'doLogin()'}">${authMode==='register'?'Kayıt Ol':'Giriş Yap'}</button>
-      <div style="margin-top:16px;text-align:center;font-size:0.85rem;color:var(--text2);cursor:pointer;" onclick="toggleAuthMode()">
-        ${authMode==='register'?'Zaten hesabın var mı? Giriş Yap':'Hesabın yok mu? Kayıt Ol'}
-      </div>
+function showLoading(msg){
+  document.getElementById("root").innerHTML=`
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;">
+      <div style="width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+      <div style="font-family:'JetBrains Mono',monospace;color:var(--text2);font-size:0.85rem;letter-spacing:1px;">${msg}</div>
     </div>`;
 }
 
+// ── AKSİYONLAR ──────────────────────────────────────────────
+window.toggleTopic = function(subj, i){
+  const key = subj + ":" + i;
+  const wasDone = !!userData.done[key];
+  userData.done[key] = !wasDone;
+  
+  const xpAmt = SUBJECTS[subj].xp;
+  if(!wasDone){
+    userData.xp += xpAmt;
+    showReward("🎉", "Tebrikler!", `${SUBJECTS[subj].label} konusunu tamamladın.`, xpAmt);
+  } else {
+    userData.xp = Math.max(0, userData.xp - xpAmt);
+  }
+  scheduleSave();
+  render();
+};
+
+window.setSub = function(s){
+  activeSub = s;
+  render();
+};
+
+window.logout = function(){
+  signOut(auth);
+};
+
 window.toggleAuthMode = function(){
-  authMode = authMode==='register'?'login':'register';
-  renderAuth();
+  authMode = authMode === 'login' ? 'register' : 'login';
+  render();
 };
 
 window.doRegister = async function(){
   const name = document.getElementById("authName")?.value.trim();
   const email = document.getElementById("authEmail")?.value.trim();
   const pass = document.getElementById("authPass")?.value;
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(cred.user, {displayName: name});
-    await setDoc(doc(db,"users",cred.user.uid), { done:{}, xp:0, streak:[], name: name });
-  } catch(e) { document.getElementById("authErr").textContent = e.message; }
+  const err = document.getElementById("authErr");
+  if(!name || !email || !pass){ err.textContent="Lütfen tüm alanları doldur."; return; }
+  err.textContent = "Kayıt yapılıyor...";
+  try{
+    const cred = await createUserWithEmailAndPassword(auth,email,pass);
+    await updateProfile(cred.user,{displayName:name});
+    await setDoc(doc(db,"users",cred.user.uid), { done:{}, xp:0, streak:[], name:name });
+  }catch(e){ err.textContent = e.message; }
 };
 
 window.doLogin = async function(){
   const email = document.getElementById("authEmail")?.value.trim();
   const pass = document.getElementById("authPass")?.value;
-  try { await signInWithEmailAndPassword(auth, email, pass); } 
-  catch(e) { document.getElementById("authErr").textContent = "Giriş Başarısız: " + e.message; }
+  const err = document.getElementById("authErr");
+  if(!email || !pass){ err.textContent="Lütfen bilgileri gir."; return; }
+  err.textContent = "Giriş yapılıyor...";
+  try{
+    await signInWithEmailAndPassword(auth,email,pass);
+  }catch(e){ err.textContent = "Giriş Başarısız: " + e.message; }
 };
 
-function renderDashboard(){
-  const topics = TOPICS[activeSub] || [];
-  let topicsHTML = topics.map((t, i)=>{
-    const isDone = !!userData.done[activeSub+":"+i];
-    return `
-      <div class="topic-item" onclick="toggleTopic('${activeSub}', ${i})">
-        <input type="checkbox" ${isDone?'checked':''} readonly />
-        <span style="${isDone?'text-decoration:line-through;opacity:0.6;':''}">${t}</span>
-      </div>`;
-  }).join('');
+window.doForgotPassword = async function(){
+  const email = document.getElementById("authEmail")?.value.trim();
+  const err = document.getElementById("authErr");
+  if(!email){ err.textContent="Şifre sıfırlama için e-posta girin."; return; }
+  try{
+    await sendPasswordResetEmail(auth, email);
+    err.style.color = "#2ed573";
+    err.textContent = "Sıfırlama bağlantısı e-posta adresinize gönderildi.";
+  }catch(e){ err.textContent = e.message; }
+};
 
-  let tabsHTML = Object.keys(SUBJECTS).map(s=>`
-    <button onclick="setSub('${s}')" class="btn" style="background:${activeSub===s?SUBJECTS[s].color:'transparent'};border:1px solid ${SUBJECTS[s].color};padding:6px 12px;font-size:0.8rem;margin:2px;">
+// ── ANA RENDER FONKSİYONU ────────────────────────────────────
+function render(){
+  const root = document.getElementById("root");
+
+  // Kullanıcı Giriş Yapmamışsa
+  if(!currentUser){
+    root.innerHTML = `
+      <div style="max-width:400px;margin:80px auto;padding:24px;" class="card">
+        <h2 style="margin-bottom:20px;text-align:center;font-weight:800;">YKSKoç Panel</h2>
+        <div id="authErr" style="color:#ff4757;margin-bottom:12px;font-size:0.85rem;text-align:center;"></div>
+        ${authMode==='register' ? '<input id="authName" class="input-field" placeholder="Ad Soyad" />' : ''}
+        <input id="authEmail" class="input-field" type="email" placeholder="E-posta" />
+        <input id="authPass" class="input-field" type="password" placeholder="Şifre" />
+        <button class="btn-primary" style="width:100%;margin-top:8px;" onclick="${authMode==='register'?'doRegister()':'doLogin()'}">
+          ${authMode==='register' ? 'Kayıt Ol' : 'Giriş Yap'}
+        </button>
+        <div style="margin-top:16px;display:flex;justify-between;font-size:0.85rem;color:var(--text2);">
+          <span style="cursor:pointer;" onclick="toggleAuthMode()">
+            ${authMode==='register' ? 'Giriş Yap' : 'Kayıt Ol'}
+          </span>
+          ${authMode==='login' ? '<span style="cursor:pointer;" onclick="doForgotPassword()">Şifremi Unuttum</span>' : ''}
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Kullanıcı Giriş Yapmışsa (Dashboard)
+  const stats = calcStats();
+  const levelInfo = getLevel(userData.xp);
+  const currentTopics = TOPICS[activeSub] || [];
+
+  const navTabs = Object.keys(SUBJECTS).map(s => `
+    <button onclick="setSub('${s}')" class="tab-btn ${activeSub===s?'active':''}" style="${activeSub===s?`background:${SUBJECTS[s].color};border-color:${SUBJECTS[s].color}`:''}">
       ${SUBJECTS[s].label}
     </button>
   `).join('');
 
-  document.getElementById("root").innerHTML = `
-    <div style="max-width:900px;margin:0 auto;padding:24px;">
-      <div style="display:flex;justify-between;align-items:center;margin-bottom:24px;">
-        <h2>Hoş Geldin, ${userData.name || 'Öğrenci'} 👋</h2>
+  const topicItems = currentTopics.map((t, i) => {
+    const isDone = !!userData.done[activeSub+":"+i];
+    return `
+      <div class="topic-card ${isDone?'done':''}" onclick="toggleTopic('${activeSub}', ${i})">
+        <span style="font-size:0.95rem;font-weight:600;">${t}</span>
+        <div class="checkbox">${isDone?'✓':''}</div>
+      </div>`;
+  }).join('');
+
+  root.innerHTML = `
+    <div class="container">
+      <!-- Üst Bilgi Barı -->
+      <div class="header">
         <div>
-          <span style="margin-right:16px;font-weight:700;color:#ffd60a;">XP: ${userData.xp}</span>
-          <button class="btn" style="background:#ff4757;" onclick="logout()">Çıkış</button>
+          <h2 style="font-weight:800;font-size:1.4rem;">Hoş Geldin, ${userData.name || 'Öğrenci'} 👋</h2>
+          <div style="font-size:0.85rem;color:var(--text2);margin-top:4px;">${levelInfo.lvl.name}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="text-align:right;">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:#ffd60a;">${userData.xp} XP</div>
+            <div style="font-size:0.75rem;color:var(--text3);">Seviye İlerlemesi %${levelInfo.pct}</div>
+          </div>
+          <button class="btn-primary" style="background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid rgba(239,68,68,0.3);padding:8px 14px;" onclick="logout()">Çıkış</button>
         </div>
       </div>
-      <div style="margin-bottom:16px;">${tabsHTML}</div>
+
+      <!-- İstatistikler -->
+      <div class="grid-2">
+        <div class="card">
+          <div style="font-size:0.85rem;color:var(--text2);font-weight:600;">TYT İlerlemesi</div>
+          <div style="font-size:1.6rem;font-weight:800;margin:8px 0;color:#3b82f6;">${stats.tD} / ${stats.tT} Konu</div>
+          <div style="height:6px;background:var(--bg3);border-radius:10px;overflow:hidden;">
+            <div style="height:100%;width:${Math.round((stats.tD/stats.tT)*100||0)}%;background:#3b82f6;"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:0.85rem;color:var(--text2);font-weight:600;">AYT İlerlemesi</div>
+          <div style="font-size:1.6rem;font-weight:800;margin:8px 0;color:#ef4444;">${stats.aD} / ${stats.aT} Konu</div>
+          <div style="height:6px;background:var(--bg3);border-radius:10px;overflow:hidden;">
+            <div style="height:100%;width:${Math.round((stats.aD/stats.aT)*100||0)}%;background:#ef4444;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dersler & Konu Listesi -->
+      <div class="nav-tabs">${navTabs}</div>
+
       <div class="card">
-        <h3 style="margin-bottom:16px;color:${SUBJECTS[activeSub].color}">${SUBJECTS[activeSub].label} Konuları</h3>
-        <div>${topicsHTML}</div>
+        <div style="display:flex;justify-between;align-items:center;margin-bottom:16px;">
+          <h3 style="color:${SUBJECTS[activeSub].color};font-weight:800;">${SUBJECTS[activeSub].label} Konu Takibi</h3>
+          <span style="font-size:0.85rem;color:var(--text2);">Konu başı +${SUBJECTS[activeSub].xp} XP</span>
+        </div>
+        <div class="topic-list">${topicItems}</div>
       </div>
     </div>`;
 }

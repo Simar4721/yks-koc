@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YKSKoç 2027 - Profesyonel Çalışma ve Takip Paneli</title>
+    <title>YKSKoç 2027 - Gamified Study & Progress Panel</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
@@ -136,6 +136,35 @@
             margin-top: 4px;
         }
 
+        /* Gamification XP Box */
+        .xp-badge-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid var(--primary);
+            padding: 10px 20px;
+            border-radius: 12px;
+        }
+
+        .xp-badge-container i {
+            font-size: 24px;
+            color: var(--warning);
+        }
+
+        .xp-text span {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .xp-text strong {
+            font-size: 18px;
+            color: var(--text-main);
+        }
+
         /* Countdown Banner */
         .countdown-banner {
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
@@ -230,6 +259,93 @@
             color: var(--primary);
         }
 
+        /* Curriculum & Topics Styles */
+        .exam-toggle-btns {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .accordion-item {
+            background: var(--bg-color);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 16px 20px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion-content {
+            padding: 0 20px 16px 20px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid var(--card-border);
+            padding-top: 14px;
+        }
+
+        .accordion-item.open .accordion-content {
+            display: flex;
+        }
+
+        .topic-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--card-bg);
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .topic-row label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .topic-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--success);
+        }
+
+        .xp-tag {
+            font-size: 12px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
         /* AI Coach Section Styles */
         .ai-chat-container {
             display: flex;
@@ -285,10 +401,6 @@
             font-size: 14px;
         }
 
-        .ai-input-box input:focus, .form-control:focus {
-            border-color: var(--primary);
-        }
-
         .btn {
             background: var(--primary);
             color: white;
@@ -302,13 +414,6 @@
 
         .btn:hover {
             background: var(--primary-hover);
-        }
-
-        .quick-prompts {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 12px;
         }
 
         .prompt-chip {
@@ -325,7 +430,6 @@
         .prompt-chip:hover {
             background: var(--primary);
             color: white;
-            border-color: var(--primary);
         }
 
         /* Tracker Table */
@@ -340,11 +444,6 @@
             text-align: left;
             border-bottom: 1px solid var(--card-border);
             font-size: 14px;
-        }
-
-        .exam-table th {
-            color: var(--text-muted);
-            font-weight: 600;
         }
 
         /* Responsive */
@@ -370,6 +469,7 @@
         </div>
         <ul class="nav-links">
             <li><a href="#" class="active" onclick="switchView('dashboard', this, event)"><i class="fa-solid fa-house"></i> Panel</a></li>
+            <li><a href="#" onclick="switchView('curriculum', this, event)"><i class="fa-solid fa-book-open"></i> Müfretat & Puan</a></li>
             <li><a href="#" onclick="switchView('aikoach', this, event)"><i class="fa-solid fa-robot"></i> Yapay Zeka Koç</a></li>
             <li><a href="#" onclick="switchView('tracker', this, event)"><i class="fa-solid fa-chart-line"></i> Net Takip & Deneme</a></li>
             <li><a href="#" onclick="switchView('pomodoro', this, event)"><i class="fa-solid fa-stopwatch"></i> Kronometre</a></li>
@@ -384,6 +484,16 @@
                 <h2>Hedef: YKS 2027 🚀</h2>
                 <p>Bugün harika bir çalışma günü olsun. Planına sadık kal!</p>
             </div>
+
+            <!-- XP Gamification Badge -->
+            <div class="xp-badge-container">
+                <i class="fa-solid fa-trophy"></i>
+                <div class="xp-text">
+                    <span id="userLevel">SEVİYE 1 (ÇAYLAK)</span>
+                    <strong id="userXP">0 XP</strong>
+                </div>
+            </div>
+
             <div class="user-profile" style="display: flex; align-items: center; gap: 10px;">
                 <i class="fa-solid fa-circle-user" style="font-size: 32px; color: var(--primary);"></i>
                 <div>
@@ -422,10 +532,6 @@
                             <input type="checkbox" style="width: 18px; height: 18px; accent-color: var(--primary);"> 
                             <span>Matematik Fonksiyonlar Tekrarı</span>
                         </label>
-                        <label style="display: flex; align-items: center; gap: 10px; background: var(--bg-color); padding: 12px; border-radius: 10px; border: 1px solid var(--card-border); cursor: pointer;">
-                            <input type="checkbox" style="width: 18px; height: 18px; accent-color: var(--primary);"> 
-                            <span>Kimya Bilimi / Simyadan Kimyaya</span>
-                        </label>
                     </div>
                 </div>
 
@@ -439,28 +545,37 @@
             </div>
         </section>
 
+        <!-- CURRICULUM VIEW (TYT/AYT & GAMIFICATION) -->
+        <section id="curriculum" class="view-section">
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-book-open"></i> Ders & Konu Takip Sistemi</div>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Bitirdiğin her konu sana **+50 XP** kazandırır!</p>
+                
+                <div class="exam-toggle-btns">
+                    <button class="toggle-btn active" onclick="switchExamType('TYT', this)">TYT Konuları</button>
+                    <button class="toggle-btn" onclick="switchExamType('AYT', this)">AYT Konuları</button>
+                </div>
+
+                <!-- Subjects Accordion Area -->
+                <div id="curriculumContainer">
+                    <!-- Dynamic Accordions injected via JS -->
+                </div>
+            </div>
+        </section>
+
         <!-- AI COACH VIEW -->
         <section id="aikoach" class="view-section">
             <div class="card">
                 <div class="card-title"><i class="fa-solid fa-robot"></i> Yapay Zeka YKS Koçu</div>
-                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Netlerin, çalışma programın veya motivasyonun hakkında koçuna dilediğini sor.</p>
-                
                 <div class="ai-chat-container">
                     <div class="ai-chat-messages" id="chatMessages">
                         <div class="ai-msg bot">
-                            Merhaba! Ben senin YKS 2027 yapay zeka koçunum. Sana nasıl yardımcı olabilirim? Net artırma taktikleri, kaynak önerileri veya program hazırlama konusunda bana danışabilirsin.
+                            Merhaba! Ben senin YKS 2027 yapay zeka koçunum. Sana nasıl yardımcı olabilirim?
                         </div>
                     </div>
-                    
                     <div class="ai-input-box">
-                        <input type="text" id="userInput" placeholder="Koçuna bir şey sor... (Örn: Matematik netlerim artmıyor ne yapmalıyım?)" onkeypress="handleAIEnter(event)">
+                        <input type="text" id="userInput" placeholder="Koçuna bir şey sor..." onkeypress="handleAIEnter(event)">
                         <button class="btn" onclick="sendAIMessage()"><i class="fa-solid fa-paper-plane"></i> Gönder</button>
-                    </div>
-
-                    <div class="quick-prompts">
-                        <div class="prompt-chip" onclick="setPrompt('TYT netlerimi nasıl 70+ yapabilirim?')">TYT 70+ Hedefi</div>
-                        <div class="prompt-chip" onclick="setPrompt('Paragraf hızımı nasıl artırabilirim?')">Paragraf Taktiği</div>
-                        <div class="prompt-chip" onclick="setPrompt('Derece için günlük kaç saat çalışmalıyım?')">Derece Çalışma Stratejisi</div>
                     </div>
                 </div>
             </div>
@@ -470,11 +585,8 @@
         <section id="tracker" class="view-section">
             <div class="card">
                 <div class="card-title"><i class="fa-solid fa-chart-line"></i> Deneme Sınavı Takip Tablosu</div>
-                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Çözdüğün deneme sonuçlarını kaydederek gelişimini takip et.</p>
-                
-                <!-- Deneme Ekle Formu -->
                 <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-                    <input type="text" id="examName" class="form-control" placeholder="Deneme Adı (Örn: Yayın Deneme-1)" style="min-width: 200px;">
+                    <input type="text" id="examName" class="form-control" placeholder="Deneme Adı" style="min-width: 200px;">
                     <input type="number" id="examNet" class="form-control" placeholder="Toplam Net" style="max-width: 150px;">
                     <button class="btn" onclick="addExamRecord()"><i class="fa-solid fa-plus"></i> Kaydet</button>
                 </div>
@@ -487,9 +599,7 @@
                             <th>Toplam Net</th>
                         </tr>
                     </thead>
-                    <tbody id="examTableBody">
-                        <!-- Kayıtlar buraya gelecek -->
-                    </tbody>
+                    <tbody id="examTableBody"></tbody>
                 </table>
             </div>
         </section>
@@ -509,21 +619,58 @@
         <!-- SETTINGS VIEW -->
         <section id="settings" class="view-section">
             <div class="card">
-                <div class="card-title"><i class="fa-solid fa-gear"></i> Hesap ve Sınav Ayarları</div>
-                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Hedef Alanınızı Seçin:</p>
-                <select class="form-control" style="max-width: 300px;">
-                    <option>Sayısal (YKS 2027)</option>
-                    <option>Eşit Ağırlık (YKS 2027)</option>
-                    <option>Sözel (YKS 2027)</option>
-                    <option>Yabancı Dil (YKS 2027)</option>
-                </select>
+                <div class="card-title"><i class="fa-solid fa-gear"></i> Ayarlar</div>
+                <p style="color: var(--text-muted); font-size: 14px;">Hedef Alan: Sayısal (YKS 2027)</p>
             </div>
         </section>
     </main>
 
     <!-- JavaScript Kodları -->
     <script>
-        // 1. Sekme Değiştirme Fonksiyonu
+        // Müfredat Veri Yapısı
+        const curriculumData = {
+            TYT: [
+                {
+                    subject: "Matematik",
+                    topics: ["Temel Kavramlar", "Sayı Basamakları", "Bölme - Bölünebilme", "Rasyonel Sayılar", "Denklemler", "Üslü-Köklü İfadeler", "Problemler", "Fonksiyonlar"]
+                },
+                {
+                    subject: "Türkçe",
+                    topics: ["Sözcükte Anlam", "Cümlede Anlam", "Paragraf Bilgisi", "Yazım Kuralları", "Noktalama İşaretleri", "Dil Bilgisi"]
+                },
+                {
+                    subject: "Fizik",
+                    topics: ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Hareket ve Kuvvet", "İş, Güç ve Enerji", "Isı ve Sıcaklık", "Elektrik"]
+                },
+                {
+                    subject: "Kimya",
+                    topics: ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Halleri", "Asitler, Bazlar ve Tuzlar"]
+                }
+            ],
+            AYT: [
+                {
+                    subject: "Matematik",
+                    topics: ["Polinomlar", "2. Dereceden Denklemler", "Parabol", "Trigonometri", "Logaritma", "Diziler", "Limit", "Türev", "İntegral"]
+                },
+                {
+                    subject: "Fizik",
+                    topics: ["Vektörler", "Bağıl Hareket", "Newton'un Hareket Yasaları", "Atışlar", "İtme ve Momentum", "Çembersel Hareket"]
+                },
+                {
+                    subject: "Kimya",
+                    topics: ["Modern Atom Teorisi", "Gazlar", "Sıvı Çözeltiler", "Kimyasal Tepkimelerde Enerji", "Tepkime Hızları ve Denge", "Organik Kimya"]
+                },
+                {
+                    subject: "Biyoloji",
+                    topics: ["Sinir Sistemi", "Endokrin Sistem", "Duyu Organları", "Destek ve Hareket Sistemi", "Sindirim Sistemi", "Dolaşım Sistemi", "Genden Proteine"]
+                }
+            ]
+        };
+
+        let currentXP = parseInt(localStorage.getItem('userXP')) || 0;
+        let activeExamType = 'TYT';
+
+        // 1. Sekme Değiştirme
         function switchView(viewId, element, event) {
             if (event) event.preventDefault();
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
@@ -533,147 +680,101 @@
             element.classList.add('active');
         }
 
-        // 2. YKS 2027 Geri Sayım Sayacı (Hedef: 19 Haziran 2027 Saat 10:15)
+        // 2. Müfredat Yükleme ve Akordiyon Yapısı
+        function renderCurriculum() {
+            const container = document.getElementById('curriculumContainer');
+            container.innerHTML = '';
+
+            const list = curriculumData[activeExamType];
+
+            list.forEach((item, index) => {
+                const accordion = document.createElement('div');
+                accordion.className = 'accordion-item';
+
+                let topicsHTML = '';
+                item.topics.forEach(top => {
+                    const topicKey = `${activeExamType}_${item.subject}_${top}`;
+                    const isChecked = localStorage.getItem(topicKey) === 'true';
+
+                    topicsHTML += `
+                        <div class="topic-row">
+                            <label>
+                                <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleTopic('${topicKey}', this)">
+                                <span>${top}</span>
+                            </label>
+                            <span class="xp-tag">+50 XP</span>
+                        </div>
+                    `;
+                });
+
+                accordion.innerHTML = `
+                    <div class="accordion-header" onclick="this.parentElement.classList.toggle('open')">
+                        <span><i class="fa-solid fa-angle-right"></i> ${item.subject}</span>
+                        <span style="font-size: 12px; color: var(--text-muted);">${item.topics.length} Konu</span>
+                    </div>
+                    <div class="accordion-content">
+                        ${topicsHTML}
+                    </div>
+                `;
+
+                container.appendChild(accordion);
+            });
+        }
+
+        function switchExamType(type, btn) {
+            activeExamType = type;
+            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderCurriculum();
+        }
+
+        // 3. Puan ve Level Güncelleme
+        function toggleTopic(key, checkbox) {
+            if (checkbox.checked) {
+                localStorage.setItem(key, 'true');
+                currentXP += 50;
+            } else {
+                localStorage.setItem(key, 'false');
+                currentXP = Math.max(0, currentXP - 50);
+            }
+            
+            localStorage.setItem('userXP', currentXP);
+            updateXPUI();
+        }
+
+        function updateXPUI() {
+            document.getElementById('userXP').innerText = `${currentXP} XP`;
+            
+            let level = "SEVİYE 1 (ÇAYLAK)";
+            if (currentXP >= 1000) level = "SEVİYE 5 (YKS ÜSTADI)";
+            else if (currentXP >= 600) level = "SEVİYE 4 (SAVAŞÇI)";
+            else if (currentXP >= 300) level = "SEVİYE 3 (MÜCADELECİ)";
+            else if (currentXP >= 100) level = "SEVİYE 2 (ÇALIŞKAN)";
+
+            document.getElementById('userLevel').innerText = level;
+        }
+
+        // 4. Geri Sayım Sayacı
         const targetDate = new Date('June 19, 2027 10:15:00').getTime();
 
         function updateCountdown() {
             const now = new Date().getTime();
             const distance = targetDate - now;
 
-            if (distance < 0) {
-                document.querySelector('.countdown-info h3').innerText = "YKS 2027 Başladı veya Sona Erdi!";
-                return;
-            }
+            if (distance < 0) return;
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((distance % (1000 * 60)) / 1000);
-
-            document.getElementById('days').innerText = String(days).padStart(2, '0');
-            document.getElementById('hours').innerText = String(hours).padStart(2, '0');
-            document.getElementById('mins').innerText = String(mins).padStart(2, '0');
-            document.getElementById('secs').innerText = String(secs).padStart(2, '0');
+            document.getElementById('days').innerText = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0');
+            document.getElementById('hours').innerText = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+            document.getElementById('mins').innerText = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+            document.getElementById('secs').innerText = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
         }
 
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // 3. Yapay Zeka Koç Etkileşim Motoru
-        function setPrompt(text) {
-            document.getElementById('userInput').value = text;
-        }
-
-        function handleAIEnter(e) {
-            if (e.key === 'Enter') {
-                sendAIMessage();
-            }
-        }
-
-        function sendAIMessage() {
-            const inputField = document.getElementById('userInput');
-            const messageText = inputField.value.trim();
-            if (!messageText) return;
-
-            const chatMessages = document.getElementById('chatMessages');
-
-            // Kullanıcı mesajını ekle
-            const userMsgDiv = document.createElement('div');
-            userMsgDiv.className = 'ai-msg user';
-            userMsgDiv.innerText = messageText;
-            chatMessages.appendChild(userMsgDiv);
-
-            inputField.value = '';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            // Yapay zeka yanıtını simüle et
-            setTimeout(() => {
-                const botMsgDiv = document.createElement('div');
-                botMsgDiv.className = 'ai-msg bot';
-                botMsgDiv.innerText = getAIResponse(messageText);
-                chatMessages.appendChild(botMsgDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 600);
-        }
-
-        function getAIResponse(query) {
-            const q = query.toLowerCase();
-            if (q.includes('net') || q.includes('art')) {
-                return "Netlerini artırmak için öncelikle her deneme sonrası 'Kırmızı Kutu' analizi yapmalısın. Yanlış yaptığın veya boş bıraktığın soruların konularını belirle ve haftalık tekrar listene ekle. Paragraf ve rutin problem çözmeyi asla ihmal etme!";
-            } else if (q.includes('paragraf')) {
-                return "Paragraf hızını artırmak için her gün düzenli olarak süre tutarak 20-30 soru çözmelisin. Sorularda önce soru kökünü okumak metne odaklanmanı kolaylaştırır.";
-            } else if (q.includes('kaç saat') || q.includes('derece')) {
-                return "YKS 2027 uzun bir maraton. Şu an için günde istikrarlı 4-6 kaliteli saat, okul dışı günler için ise 7-8 saat idealdir. Önemli olan kaç saat çalıştığın değil, ne kadar odaklandığındır.";
-            } else {
-                return "Harika bir soru! YKS 2027 hazırlığında süre çok uzun gözükse de hızla akıp gidecek. Temel kavramları sıkı tutarak ve eksik konularını kapatarak ilerle. Sana bu yolda rehberlik etmek için buradayım!";
-            }
-        }
-
-        // 4. Çalışan Pomodoro Mantığı
-        let pomoInterval;
-        let pomoSeconds = 1500; // 25 dakika
-        let isPomoRunning = false;
-
-        function updatePomoDisplay() {
-            const m = Math.floor(pomoSeconds / 60);
-            const s = pomoSeconds % 60;
-            document.getElementById('pomodoroTimer').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-        }
-
-        function togglePomodoro() {
-            const btn = document.getElementById('pomoStartBtn');
-            if (isPomoRunning) {
-                clearInterval(pomoInterval);
-                isPomoRunning = false;
-                btn.innerHTML = `<i class="fa-solid fa-play"></i> Başlat`;
-            } else {
-                isPomoRunning = true;
-                btn.innerHTML = `<i class="fa-solid fa-pause"></i> Durdur`;
-                pomoInterval = setInterval(() => {
-                    if (pomoSeconds > 0) {
-                        pomoSeconds--;
-                        updatePomoDisplay();
-                    } else {
-                        clearInterval(pomoInterval);
-                        alert("Pomodoro Süresi Doldu! Mola Verme Zamanı.");
-                        resetPomodoro();
-                    }
-                }, 1000);
-            }
-        }
-
-        function resetPomodoro() {
-            clearInterval(pomoInterval);
-            isPomoRunning = false;
-            pomoSeconds = 1500;
-            updatePomoDisplay();
-            document.getElementById('pomoStartBtn').innerHTML = `<i class="fa-solid fa-play"></i> Başlat`;
-        }
-
-        // 5. Deneme Kaydetme Mantığı
-        function addExamRecord() {
-            const nameInput = document.getElementById('examName');
-            const netInput = document.getElementById('examNet');
-            
-            if (!nameInput.value || !netInput.value) {
-                alert("Lütfen tüm alanları doldurun!");
-                return;
-            }
-
-            const tbody = document.getElementById('examTableBody');
-            const dateStr = new Date().toLocaleDateString('tr-TR');
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${dateStr}</td>
-                <td>${nameInput.value}</td>
-                <td><strong style="color: var(--primary);">${netInput.value} Net</strong></td>
-            `;
-
-            tbody.appendChild(tr);
-            nameInput.value = '';
-            netInput.value = '';
-        }
+        // Sayfa Yüklendiğinde Başlat
+        renderCurriculum();
+        updateXPUI();
     </script>
 </body>
 </html>

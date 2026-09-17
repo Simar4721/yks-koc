@@ -128,6 +128,230 @@ table tr{transition:background .16s ease}
 }
 
 </style>
+
+<style id="yks-pro-enhancements">
+#yksProFeatures{margin:24px 0 40px;font-family:inherit}
+#yksProFeatures *{box-sizing:border-box}
+.yks-pro-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}
+.yks-card{grid-column:span 4;background:var(--card-bg,#fff);border:1px solid rgba(100,116,139,.16);border-radius:20px;padding:20px;box-shadow:0 12px 35px rgba(15,23,42,.07)}
+.yks-card.wide{grid-column:span 8}.yks-card.full{grid-column:1/-1}
+.yks-card h3{margin:0 0 6px;font-size:18px}.yks-muted{color:#64748b;font-size:13px}
+.yks-stat{font-size:28px;font-weight:800;margin:8px 0}
+.yks-progress{height:9px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin:12px 0}
+.yks-progress>span{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#6366f1,#06b6d4)}
+.yks-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.yks-btn{border:0;border-radius:12px;padding:10px 13px;cursor:pointer;font-weight:700;background:#eef2ff;color:#3730a3}
+.yks-btn.primary{background:linear-gradient(135deg,#4f46e5,#0891b2);color:#fff}
+.yks-btn.danger{background:#fee2e2;color:#991b1b}
+.yks-input,.yks-select,.yks-textarea{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:12px;background:transparent;color:inherit;outline:none}
+.yks-input:focus,.yks-select:focus,.yks-textarea:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.13)}
+.yks-form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.yks-form .fullrow{grid-column:1/-1}
+.yks-list{display:grid;gap:9px;margin-top:12px;max-height:280px;overflow:auto}
+.yks-item{padding:11px 12px;border-radius:13px;background:rgba(148,163,184,.09);display:flex;align-items:center;gap:10px}
+.yks-item .grow{flex:1;min-width:0}.yks-item small{color:#64748b}
+.yks-check{width:20px;height:20px;accent-color:#4f46e5}
+.yks-tag{display:inline-flex;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:800;background:#eef2ff;color:#4338ca}
+.yks-tag.red{background:#fee2e2;color:#b91c1c}.yks-tag.yellow{background:#fef3c7;color:#92400e}.yks-tag.green{background:#dcfce7;color:#166534}
+.yks-heatmap{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;margin-top:14px}
+.yks-day{aspect-ratio:1;border-radius:4px;background:#e2e8f0;cursor:pointer}.yks-day[data-level="1"]{background:#c7d2fe}.yks-day[data-level="2"]{background:#818cf8}.yks-day[data-level="3"]{background:#4f46e5}.yks-day[data-level="4"]{background:#312e81}
+.yks-chart{height:180px;display:flex;align-items:end;gap:7px;margin-top:16px;padding:10px 0}
+.yks-bar{flex:1;min-width:4px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#06b6d4,#6366f1);height:4%;transition:.3s}
+.yks-bar span{display:block;text-align:center;font-size:10px;margin-top:-18px;color:#64748b}
+.yks-empty{padding:20px;text-align:center;color:#64748b;border:1px dashed #cbd5e1;border-radius:14px}
+.yks-ai{background:linear-gradient(135deg,rgba(79,70,229,.10),rgba(8,145,178,.10))}
+.yks-section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+@media(max-width:900px){.yks-card,.yks-card.wide{grid-column:1/-1}.yks-form{grid-template-columns:1fr}.yks-form .fullrow{grid-column:auto}}
+@media(prefers-color-scheme:dark){
+ .yks-card{background:rgba(15,23,42,.72);border-color:rgba(148,163,184,.18)}
+ .yks-input,.yks-select,.yks-textarea{border-color:#475569}
+ .yks-progress,.yks-day{background:#334155}.yks-item{background:rgba(51,65,85,.35)}
+}
+</style>
+
+
+
+
+<style id="yks-screenshot-theme">
+:root{
+  --bg:#070a0f;--bg2:#0d1219;--bg3:#121923;
+  --border:rgba(148,163,184,.14);--border2:rgba(148,163,184,.22);
+  --text:#f5f7fb;--text2:#91a0b2;--text3:#cbd5e1;
+  --accent:#ff7a1a;--accent2:#ff9f43;--accent-rgb:255,122,26;
+  --green:#45df8b;--blue:#4da3ff;--red:#ff6876;--yellow:#ffd24a;
+  --shadow:0 16px 40px rgba(0,0,0,.24);
+}
+body{
+  background:
+    radial-gradient(800px 520px at 0% -10%,rgba(var(--accent-rgb),.08),transparent 64%),
+    radial-gradient(800px 520px at 100% 100%,rgba(56,189,248,.035),transparent 66%),
+    #070a0f!important;
+  color:var(--text)!important;font-family:'Manrope',sans-serif!important;
+}
+body::before{background:linear-gradient(130deg,rgba(255,255,255,.012),transparent 40%,rgba(var(--accent-rgb),.012))!important}
+#root{min-height:100vh}
+#root>div.yks-app-shell{min-height:100vh}
+.yks-page-wrap{margin-left:232px;padding:26px 28px 44px;max-width:1530px}
+.yks-sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:232px;z-index:100;
+  background:linear-gradient(180deg,#0a0e13,#080b10);
+  border-right:1px solid rgba(148,163,184,.10);
+  padding:20px 10px 14px;display:flex;flex-direction:column;
+}
+.yks-brand{display:flex;flex-direction:column;align-items:center;text-align:center;padding:3px 0 18px;border-bottom:1px solid rgba(148,163,184,.08)}
+.yks-brand-tiger{width:104px;height:104px;filter:drop-shadow(0 12px 25px rgba(var(--accent-rgb),.22))}
+.yks-brand-name{font-size:2rem;font-weight:850;letter-spacing:-.04em;margin-top:-1px}
+.yks-brand-sub{font-size:.57rem;letter-spacing:2.6px;color:#778396;margin-top:4px}
+.yks-nav{display:flex;flex-direction:column;gap:4px;margin-top:14px;flex:1}
+.yks-nav button{
+  border:1px solid transparent!important;background:transparent!important;color:#aeb8c6!important;
+  min-height:44px;padding:10px 14px;border-radius:10px;display:flex;align-items:center;gap:11px;
+  font-size:.82rem;font-weight:600;cursor:pointer;text-align:left!important;
+}
+.yks-nav button:hover{background:rgba(var(--accent-rgb),.07)!important;color:#fff!important;transform:none!important}
+.yks-nav button.active{
+  background:linear-gradient(135deg,var(--accent),#ff6b16)!important;color:#fff!important;
+  border-color:rgba(255,177,100,.35)!important;box-shadow:0 10px 24px rgba(var(--accent-rgb),.16)
+}
+.yks-nav-icon{width:20px;text-align:center;font-size:1.05rem}
+.yks-sidebar-quote{color:#9ba6b5;font-size:.76rem;font-style:italic;line-height:1.55;padding:16px 10px 12px}
+.yks-sidebar-bottom{border-top:1px solid rgba(148,163,184,.08);padding:12px 9px 0}
+.yks-theme-toggle{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.025);
+  color:#aeb8c6;border-radius:10px;padding:9px 10px;font-size:.72rem;cursor:pointer
+}
+.yks-switch{width:40px;height:22px;border-radius:99px;background:#33404e;padding:3px}
+.yks-switch span{display:block;width:16px;height:16px;border-radius:50%;background:#fff;transform:translateX(0);transition:.2s}
+.yks-switch.on{background:var(--accent)}.yks-switch.on span{transform:translateX(18px)}
+.yks-sidebar-version{color:#596679;font-size:.61rem;line-height:1.5;margin-top:9px;padding-left:2px}
+
+.yks-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:20px}
+.yks-head h1{font-size:1.62rem;line-height:1.1;margin:0 0 5px;letter-spacing:-.035em}
+.yks-head p{margin:0;color:var(--text2);font-size:.84rem}
+.yks-head-tools{display:flex;align-items:center;gap:10px}
+.yks-date,.yks-icon,.yks-avatar{
+  border:1px solid var(--border);background:rgba(13,18,25,.86);box-shadow:0 8px 25px rgba(0,0,0,.18)
+}
+.yks-date{padding:9px 13px;border-radius:9px;font-size:.7rem;color:#e0e5ed;line-height:1.25}
+.yks-icon{width:42px;height:42px;border-radius:9px;display:grid;place-items:center;font-size:1rem}
+.yks-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,#4a2d39,#211821)}
+
+.yks-top-grid{display:grid;grid-template-columns:1fr 1fr .92fr;gap:13px;margin-bottom:14px}
+.yks-count,.yks-quote,.yks-card,.yks-stat{
+  background:linear-gradient(145deg,rgba(15,21,29,.98),rgba(10,15,21,.98));
+  border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow)
+}
+.yks-count{min-height:130px;padding:20px;position:relative;overflow:hidden}
+.yks-count:after{content:"";position:absolute;width:180px;height:150px;right:-45px;bottom:-70px;border-radius:50%;background:radial-gradient(circle,rgba(var(--accent-rgb),.15),transparent 68%)}
+.yks-count.blue:after{background:radial-gradient(circle,rgba(77,163,255,.12),transparent 68%)}
+.yks-count-title{color:#b8c2cf;font-size:.8rem;display:flex;gap:9px;align-items:center}
+.yks-count-title strong{color:var(--accent);font-size:1.25rem}
+.yks-count.blue .yks-count-title strong{color:var(--blue)}
+.yks-count-value{font-size:2rem;font-weight:850;letter-spacing:-.045em;margin-top:12px}
+.yks-count-date{font-size:.68rem;color:#7e8b9d;margin-top:2px}
+.yks-quote{min-height:130px;padding:20px 22px;display:flex;align-items:center;overflow:hidden;position:relative}
+.yks-quote:after{content:"";position:absolute;inset:0;background:linear-gradient(130deg,rgba(var(--accent-rgb),.05),transparent 55%,rgba(77,163,255,.04))}
+.yks-quote blockquote{position:relative;z-index:1;font-size:.85rem;line-height:1.65;font-style:italic;margin:0}
+.yks-quote cite{display:block;color:#7d8999;font-size:.64rem;font-style:normal;margin-top:7px}
+
+.yks-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.yks-stat{padding:15px 14px;min-height:104px}
+.yks-stat-icon{font-size:1.35rem;color:var(--accent);margin-bottom:8px}
+.yks-stat-label{font-size:.63rem;color:#8b98aa}
+.yks-stat-value{font-size:1.17rem;font-weight:850;margin-top:3px}
+.yks-stat-note{font-size:.64rem;color:var(--green);margin-top:4px}
+
+.yks-main-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:13px;margin-bottom:13px}
+.yks-card{padding:17px}
+.yks-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.yks-title{font-size:.92rem;font-weight:800}.yks-subtitle{font-size:.65rem;color:#7f8b9b;margin-top:4px}
+.yks-pro-title{display:flex;align-items:center;gap:9px}.yks-pro-title .bolt{color:var(--accent);font-size:1.6rem}
+.yks-pro-badge{font-size:.58rem;border:1px solid var(--accent);color:var(--accent);padding:3px 6px;border-radius:5px;font-weight:800}
+.yks-btn-orange{
+  border:0!important;background:linear-gradient(135deg,var(--accent),#ff6817)!important;color:#fff!important;
+  border-radius:9px!important;padding:9px 13px!important;font-weight:800!important;font-size:.68rem!important;cursor:pointer!important
+}
+.yks-task-list{display:grid;gap:5px}
+.yks-task{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.022);border:1px solid rgba(148,163,184,.055);border-radius:8px;padding:10px}
+.yks-checkbox{width:20px;height:20px;border:1px solid #526071;border-radius:6px;display:grid;place-items:center;flex:none}
+.yks-checkbox.done{background:var(--green);border-color:var(--green);color:#06140d}
+.yks-task-name{flex:1;font-size:.73rem}.yks-task-time{font-size:.66rem;color:#8d99aa}
+
+.yks-heat-wrap{min-height:100%}
+.yks-heat-grid-main{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;margin:17px 0 8px}
+.yks-heat-cell-main{height:13px;border-radius:3px;background:#1c2a31}
+.yks-heat-cell-main.l1{background:#245c49}.yks-heat-cell-main.l2{background:#2e9465}.yks-heat-cell-main.l3{background:#3ed489}.yks-heat-cell-main.l4{background:#77efb1}
+.yks-heat-label{display:flex;justify-content:space-between;color:#768395;font-size:.6rem}.yks-heat-label span:last-child{display:flex;align-items:center;gap:4px}
+.yks-legend{display:inline-block;width:11px;height:11px;border-radius:3px;background:#1c2a31}.yks-legend.l1{background:#245c49}.yks-legend.l2{background:#2e9465}.yks-legend.l3{background:#3ed489}.yks-legend.l4{background:#77efb1}
+
+.yks-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}
+.yks-mini{padding:14px;border:1px solid rgba(148,163,184,.10);border-radius:10px;background:rgba(255,255,255,.018)}
+.yks-mini-icon{font-size:1.35rem;color:var(--accent);margin-bottom:5px}.yks-mini-value{font-size:1.1rem;font-weight:850}.yks-mini-note{font-size:.62rem;color:#7f8b9b;margin-top:3px}
+
+.yks-lower-grid{display:grid;grid-template-columns:1.05fr .95fr .95fr;gap:13px;margin-bottom:13px}
+.yks-chart-box{height:160px;margin-top:9px;position:relative}
+.yks-chart-box svg{width:100%;height:100%}
+.yks-donut{width:125px;height:125px;border-radius:50%;display:grid;place-items:center;margin:8px auto;position:relative}
+.yks-donut:after{content:"";position:absolute;width:73px;height:73px;border-radius:50%;background:#0e141c}
+.yks-donut span{position:relative;z-index:1;text-align:center;font-size:.68rem}
+.yks-mistakes{display:grid;gap:6px;margin-top:9px}.yks-mistake{padding:9px 10px;border:1px solid rgba(148,163,184,.06);border-radius:8px;background:rgba(255,255,255,.022);font-size:.7rem}
+.yks-mistake small{display:block;color:#7f8b9b;font-size:.59rem;margin-top:3px}
+
+.yks-assistant-grid{display:grid;grid-template-columns:1.6fr .75fr;gap:13px}
+.yks-assistant{min-height:160px}
+.yks-assistant-input{display:flex;gap:7px;margin-top:15px}.yks-assistant-input input{flex:1;min-width:0}
+.yks-input-modern,.yks-select-modern,.yks-textarea-modern{
+  width:100%;background:#101720;border:1px solid var(--border);color:#e7ebf2;border-radius:9px;padding:11px 12px;outline:none
+}
+.yks-input-modern:focus,.yks-select-modern:focus,.yks-textarea-modern:focus{border-color:rgba(var(--accent-rgb),.7);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.10)}
+.yks-send{width:43px;border:0;border-radius:9px;background:var(--accent);color:#fff;cursor:pointer;font-size:1rem}
+.yks-tiger-card{min-height:160px;overflow:hidden;position:relative;background:linear-gradient(145deg,#10161e,#0a0e14);border:1px solid rgba(var(--accent-rgb),.12);border-radius:12px;padding:17px;display:flex;align-items:flex-end}
+.yks-tiger-card:after{content:"";position:absolute;width:190px;height:190px;right:-20px;top:-10px;background:radial-gradient(circle,rgba(var(--accent-rgb),.13),transparent 65%)}
+.yks-tiger-art{position:absolute;right:-4px;bottom:-18px;width:170px;height:155px;opacity:.75;filter:drop-shadow(0 10px 20px rgba(var(--accent-rgb),.12))}
+.yks-tiger-copy{position:relative;z-index:2;max-width:55%;font-weight:850;font-size:.95rem;line-height:1.45}.yks-tiger-copy small{display:block;color:#7f8b9b;font-size:.62rem;margin-top:8px;font-weight:500}
+
+.yks-timer-card{margin-top:13px}.yks-timer-row{display:flex;align-items:center;gap:13px;flex-wrap:wrap}.yks-timer-display{font-size:2rem;font-weight:850;letter-spacing:.08em;min-width:190px}.yks-timer-spacer{flex:1}
+
+#yksProFeatures{margin-top:13px!important;background:transparent!important}
+#yksProFeatures .yks-pro-grid{display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px}
+#yksProFeatures .yks-card{grid-column:span 4;background:linear-gradient(145deg,#0f151d,#0a0f15);border-color:var(--border);border-radius:12px;box-shadow:var(--shadow)}
+#yksProFeatures .yks-card.wide{grid-column:span 8}#yksProFeatures .yks-card.full{grid-column:1/-1}
+#yksProFeatures h2,#yksProFeatures h3{color:#f3f5f8}
+#yksProFeatures .yks-btn.primary{background:var(--accent)!important;color:#fff!important}
+#yksProFeatures .yks-input,#yksProFeatures .yks-select,#yksProFeatures .yks-textarea{background:#101720!important;border-color:var(--border)!important;color:#e7ebf2!important}
+#yksProFeatures .yks-progress{background:#1a232d!important}
+#yksProFeatures .yks-progress>span{background:var(--accent)!important}
+#yksProFeatures .yks-tag{background:rgba(var(--accent-rgb),.12)!important;color:var(--accent)!important}
+#yksProFeatures .yks-item{background:rgba(255,255,255,.025)!important;border:1px solid rgba(148,163,184,.06)}
+#yksProFeatures .yks-day{background:#1c2a31!important}#yksProFeatures .yks-day[data-level="1"]{background:#245c49!important}
+#yksProFeatures .yks-day[data-level="2"]{background:#2e9465!important}#yksProFeatures .yks-day[data-level="3"]{background:#3ed489!important}
+#yksProFeatures .yks-day[data-level="4"]{background:#77efb1!important}
+
+.yks-profile-layout{max-width:900px;margin:0 auto}
+.yks-profile-tabs{display:flex;gap:5px;border-bottom:1px solid var(--border);margin-bottom:15px}
+.yks-profile-tab{border:0;background:transparent;color:#8996a7;padding:11px 14px;border-bottom:2px solid transparent;cursor:pointer;font-size:.75rem}
+.yks-profile-tab.active{color:#fff;border-bottom-color:var(--accent)}
+.yks-color-layout{display:grid;grid-template-columns:1fr .8fr;gap:13px}
+.yks-color-card{background:linear-gradient(145deg,#0f151d,#0a0f15);border:1px solid var(--border);border-radius:12px;padding:18px}
+.yks-palette{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}.yks-swatch{width:31px;height:31px;border-radius:50%;border:2px solid rgba(255,255,255,.10);cursor:pointer}.yks-swatch.active{outline:3px solid rgba(255,255,255,.16);outline-offset:2px}
+.yks-color-row{display:flex;gap:8px;align-items:center;margin-top:13px}.yks-color-row input[type=color]{width:43px;height:39px;padding:2px;background:#0a0f15;border:1px solid var(--border);border-radius:8px}.yks-color-row .hex{flex:1}
+.yks-preview-btn{display:inline-block;margin-top:14px;background:var(--accent);padding:9px 13px;border-radius:8px;font-size:.7rem;font-weight:800}
+.yks-range{width:100%;accent-color:var(--accent)}
+
+@media(max-width:1100px){
+  .yks-top-grid{grid-template-columns:1fr 1fr}.yks-quote{grid-column:1/-1}
+  .yks-stats{grid-template-columns:repeat(3,1fr)}.yks-lower-grid{grid-template-columns:1fr 1fr}.yks-lower-grid>:last-child{grid-column:1/-1}
+}
+@media(max-width:780px){
+  .yks-sidebar{position:relative;width:100%;height:auto;padding:9px}.yks-brand{flex-direction:row;justify-content:flex-start;border-bottom:0;padding:3px 7px}
+  .yks-brand-tiger{width:55px;height:55px}.yks-brand-name{font-size:1.45rem;margin:0 0 0 7px}.yks-brand-sub{display:none}
+  .yks-nav{flex-direction:row;overflow-x:auto;margin-top:0;padding-bottom:3px}.yks-nav button{min-width:max-content}
+  .yks-sidebar-quote,.yks-sidebar-bottom{display:none}.yks-page-wrap{margin-left:0;padding:15px}
+  .yks-top-grid,.yks-main-grid,.yks-lower-grid,.yks-assistant-grid,.yks-color-layout{grid-template-columns:1fr}
+  .yks-stats{grid-template-columns:1fr 1fr}.yks-head-tools{display:none}
+}
+</style>
+
 </head>
 <body>
 <div id="root"></div>
@@ -788,6 +1012,10 @@ function setPage(p){
   // stop timer when leaving dashboard? No — keep it running in background
   activePage=p;
   render();
+  setTimeout(function(){
+    const panel=document.getElementById("yksProFeatures");
+    if(panel) panel.classList.toggle("yks-dashboard-visible", p==="dashboard");
+  }, 0);
 }
 function setSubject(s){
   activeSub=s;
@@ -982,56 +1210,66 @@ function renderTopics(searchQuery=""){
 }
 
 // ── NAV ───────────────────────────────────────────────────────
+
+function yksTigerSvg(cls="yks-brand-tiger"){
+  return `<svg class="${cls}" viewBox="0 0 120 120" aria-label="YKS kaplan logosu" role="img">
+    <defs><linearGradient id="tigerOrange" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent2)"/><stop offset="1" stop-color="var(--accent)"/></linearGradient></defs>
+    <path d="M22 39 15 15l27 14c11-7 25-7 36 0l27-14-7 24c8 10 10 23 8 38-3 22-20 36-46 36S17 99 14 77c-2-15 0-28 8-38Z" fill="url(#tigerOrange)" stroke="#f5f7fb" stroke-width="2.4"/>
+    <path d="M32 42c8-12 48-12 56 0 6 9 6 23 1 35-6 14-16 23-29 23S37 91 31 77c-5-12-5-26 1-35Z" fill="#f7f8fb" stroke="#151a20" stroke-width="2.5"/>
+    <path d="M42 39 31 29M78 39l11-10M47 43 34 53M73 43l13 10M43 59l-14 7M77 59l14 7M49 77 37 91M71 77l12 14" stroke="#171b20" stroke-width="6" stroke-linecap="round"/>
+    <path d="M47 57c6-7 20-7 26 0l-3 17c-4 7-7 9-10 9s-6-2-10-9Z" fill="#171b20"/>
+    <path d="M54 63h12l-6 7Z" fill="var(--accent)"/>
+    <path d="M50 82c5 6 15 6 20 0" fill="none" stroke="#171b20" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="48" cy="58" r="3" fill="#fff"/><circle cx="72" cy="58" r="3" fill="#fff"/>
+  </svg>`;
+}
+
 function navHTML(active){
-  return `<header style="display:flex;align-items:center;justify-content:space-between;
-    padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:28px;flex-wrap:wrap;gap:12px;">
-    <div class="brandArea"><span class="brandLockup">
-  <span class="brandMark" aria-hidden="true">
-    <svg viewBox="0 0 48 48" role="img">
-      <defs><linearGradient id="yksLogoGradient" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#7c83ff"/><stop offset="100%" stop-color="#2dd4bf"/>
-      </linearGradient></defs>
-      <rect x="2" y="2" width="44" height="44" rx="14" fill="url(#yksLogoGradient)"/>
-      <path d="M14 14h5l5 8 5-8h5L26.5 27v7h-5v-7L14 14Z" fill="white"/>
-    </svg>
-  </span>
-  <span class="brandText">YKS</span>
-</span>
-      <span style="font-size:0.75rem;color:#5a6a7e;margin-left:10px;font-family:monospace;">
-        ${escapeHtml(currentUser?.displayName||currentUser?.email||"")}</span></div>
-    <nav style="display:flex;gap:6px;flex-wrap:wrap;" id="mainNav"></nav>
-  </header>`;
+  return `<aside class="yks-sidebar">
+    <div class="yks-brand">
+      ${yksTigerSvg()}
+      <div class="yks-brand-name">YKS</div>
+      <div class="yks-brand-sub">DAHA İLERİSİ SENDE</div>
+    </div>
+    <nav id="mainNav" class="yks-nav"></nav>
+    <div class="yks-sidebar-quote">“Disiplin, hayallerine giden en kısa yoldur.”</div>
+    <div class="yks-sidebar-bottom">
+      <button id="themeBtn" class="yks-theme-toggle"><span>◐ &nbsp;Karanlık Mod</span><span class="yks-switch ${isDark?"on":""}"><span></span></span></button>
+      <div class="yks-sidebar-version">YKS v2.0<br>Hedeflerin için burada.</div>
+    </div>
+  </aside>`;
 }
 function attachNav(active){
-  const nav=document.getElementById("mainNav");
-  if(!nav) return;
-  const pages=[["dashboard","📊 Panel"],["topics","📚 Konular"],["exams","📝 Denemeler"],["profile","👤 Profil"]];
-  if(isAdmin()) pages.push(["admin","🛡 Admin"]);
-  pages.forEach(([p,label])=>{
-    const btn=document.createElement("button");
-    const isAdminPage=p==="admin";
-    const isActive=active===p;
-    btn.style.cssText=`background:${isActive?(isAdminPage?"rgba(255,214,10,0.15)":"rgba(99,102,241,0.1)"):"transparent"};
-      border:1px solid ${isActive?(isAdminPage?"#ffd60a":"#6366f1"):(isAdminPage?"rgba(255,214,10,0.3)":"var(--border)")};
-      color:${isActive?(isAdminPage?"#ffd60a":"#6366f1"):(isAdminPage?"rgba(255,214,10,0.6)":"var(--text2)")};
-      padding:8px 18px;border-radius:6px;font-family:monospace;font-size:0.72rem;cursor:pointer;letter-spacing:1px;`;
-    btn.textContent=label;
-    btn.addEventListener("click",()=>setPage(p));
-    nav.appendChild(btn);
+  const nav=document.getElementById("mainNav"); if(!nav)return;
+  const pages=[
+    ["dashboard","⌂","Ana Panel"],
+    ["topics","▣","Konular"],
+    ["exams","▤","Denemeler"],
+    ["timer","◷","Zamanlayıcı"],
+    ["mistakes","☑","Yanlış Defteri"],
+    ["stats","▥","İstatistikler"],
+    ["notes","▤","Notlar"],
+    ["goals","◎","Hedefler"],
+    ["profile","♙","Profil"]
+  ];
+  if(isAdmin()) pages.push(["admin","●","Admin"]);
+  pages.forEach(([p,icon,label])=>{
+    const b=document.createElement("button");
+    b.className=active===p?"active":"";
+    b.innerHTML=`<span class="yks-nav-icon">${icon}</span><span>${label}</span>`;
+    b.addEventListener("click",()=>{
+      if(["dashboard","topics","exams","profile","admin"].includes(p)){setPage(p);return;}
+      setPage("dashboard");
+      setTimeout(()=>{
+        const id={timer:"timerPanel",mistakes:"yksProMount",stats:"statsPanel",notes:"yksProMount",goals:"goalsPanel"}[p];
+        const el=document.getElementById(id);
+        if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
+      },80);
+    });
+    nav.appendChild(b);
   });
-  const themeBtn=document.createElement("button");
-  themeBtn.id="themeBtn";
-  themeBtn.style.cssText=`background:transparent;border:1px solid var(--border);
-    color:var(--text2);padding:8px 12px;border-radius:6px;font-size:0.85rem;cursor:pointer;`;
-  themeBtn.textContent=isDark?"☀️":"🌙";
-  themeBtn.addEventListener("click",toggleTheme);
-  nav.appendChild(themeBtn);
-  const logoutBtn=document.createElement("button");
-  logoutBtn.style.cssText=`background:transparent;border:1px solid rgba(255,100,100,0.3);
-    color:#ff4757;padding:8px 14px;border-radius:6px;font-family:monospace;font-size:0.72rem;cursor:pointer;`;
-  logoutBtn.textContent="Çıkış";
-  logoutBtn.addEventListener("click",doLogout);
-  nav.appendChild(logoutBtn);
+  const theme=document.getElementById("themeBtn");
+  if(theme)theme.addEventListener("click",toggleTheme);
 }
 
 // ── THEME ─────────────────────────────────────────────────────
@@ -1066,18 +1304,7 @@ function renderAuth(){
       <div style="position:absolute;top:0;left:0;right:0;height:2px;
         background:linear-gradient(90deg,transparent,#6366f1,#14b8a6,transparent);"></div>
       <div style="text-align:center;margin-bottom:32px;">
-        <div class="authBrand"><span class="brandLockup">
-  <span class="brandMark" aria-hidden="true">
-    <svg viewBox="0 0 48 48" role="img">
-      <defs><linearGradient id="yksLogoGradient" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#7c83ff"/><stop offset="100%" stop-color="#2dd4bf"/>
-      </linearGradient></defs>
-      <rect x="2" y="2" width="44" height="44" rx="14" fill="url(#yksLogoGradient)"/>
-      <path d="M14 14h5l5 8 5-8h5L26.5 27v7h-5v-7L14 14Z" fill="white"/>
-    </svg>
-  </span>
-  <span class="brandText">YKS</span>
-</span></div>
+        <div class="authBrand" style="display:flex;flex-direction:column;align-items:center;">${yksTigerSvg("yks-brand-tiger")}<div style="font-size:1.8rem;font-weight:850;margin-top:-4px;">YKS</div></div>
         <div style="font-family:monospace;font-size:0.7rem;letter-spacing:3px;color:#5a6a7e;margin-top:6px;">
           HAYALLERİNİZE DOĞRU</div>
       </div>
@@ -1119,199 +1346,171 @@ function renderAuth(){
 
 function renderDashboard(){
   const tytDays=daysTo(TYT_DATE), aytDays=daysTo(AYT_DATE);
-  const s=calcStats();
-  const {lvl,idx,next,pct}=getLevel(userData.xp);
-  const tytPct=s.tT?Math.round(s.tD/s.tT*100):0;
-  const aytPct=s.aT?Math.round(s.aD/s.aT*100):0;
-  const streak=countStreak(userData.streak||[]);
-  const streakRecord=userData.streakRecord||streak;
+  const st=calcStats(), streak=countStreak(userData.streak||[]);
+  const displayName=escapeHtml(currentUser?.displayName||userData.name||"Öğrenci");
+  const initial=escapeHtml((currentUser?.displayName||userData.name||"S")[0].toUpperCase());
+  const totalStudy=Object.values(userData.study||{}).reduce((a,b)=>a+(Number(b)||0),0);
   const weekSec=weekStudySeconds();
-  const weekGoalSec=(userData.weeklyGoalHours||8)*3600;
-  const weekPct=Math.min(100,Math.round(weekSec/weekGoalSec*100));
-  const studiedToday=(userData.streak||[]).includes(todayStr());
+  const level=getLevel(userData.xp||0);
+  const targetRank=escapeHtml(userData.targetRank||"50.000");
+  const targetTyt=escapeHtml(userData.targetTyt||"80");
+  const targetAyt=escapeHtml(userData.targetAyt||"60");
 
   document.getElementById("root").innerHTML=`
-  <div style="max-width:1280px;margin:0 auto;padding:24px 20px;">
+  <div class="yks-app-shell">
     ${navHTML("dashboard")}
-
-    ${!studiedToday?`
-    <!-- Uyarı banner -->
-    <div id="noChallengeWarning" style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.3);border-radius:10px;
-      padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
-      <div style="font-size:1.4rem;">⚠️</div>
-      <div>
-        <div style="font-weight:700;color:#ff4757;font-size:0.9rem;">Bugün henüz çalışmadın!</div>
-        <div style="font-size:0.8rem;color:#5a6a7e;margin-top:2px;">Serini kırmamak için en az bir konu tikle veya kronometreyi başlat.</div>
+    <div class="yks-page-wrap">
+      <div class="yks-head">
+        <div><h1>Merhaba, ${displayName} 👋</h1><p>Bugün hedeflerine bir adım daha yaklaş!</p></div>
+        <div class="yks-head-tools">
+          <div class="yks-date">📅 <b>${new Date().toLocaleDateString("tr-TR",{day:"2-digit",month:"short",year:"numeric"})}</b><br><span style="color:#7d8999">${new Date().toLocaleDateString("tr-TR",{weekday:"short"})}</span></div>
+          <div class="yks-icon">🔔</div><div class="yks-avatar">${initial}</div>
+        </div>
       </div>
-    </div>`:""}
 
-    <!-- Geri sayım -->
-    <div style="background:#14141f;border:1px solid rgba(255,255,255,0.07);border-radius:16px;
-      padding:40px 20px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;
-        background:linear-gradient(90deg,transparent,#6366f1,#14b8a6,transparent);"></div>
-      <div style="font-family:monospace;font-size:0.68rem;letter-spacing:3px;color:#5a6a7e;margin-bottom:12px;">
-        YKS 2027'YE KALAN SÜRE</div>
-      <div style="font-size:clamp(3.5rem,10vw,7rem);font-weight:800;line-height:1;margin-bottom:8px;
-        background:linear-gradient(135deg,#6366f1,#14b8a6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-        ${tytDays}</div>
-      <div style="font-family:monospace;font-size:0.85rem;color:#5a6a7e;">GÜN KALDI</div>
-      <div style="margin-top:12px;font-size:0.88rem;color:#ffd60a;font-weight:600;">
-        📅 TYT: 19 Haziran 2027 (${tytDays} gün) &nbsp;|&nbsp; AYT: 20 Haziran 2027 (${aytDays} gün)
-      </div>
-    </div>
+      <section class="yks-top-grid">
+        <div class="yks-count"><div class="yks-count-title"><strong>▣</strong> TYT'ye Kalan Süre</div><div class="yks-count-value">${tytDays} Gün</div><div class="yks-count-date">19 Haziran 2027</div></div>
+        <div class="yks-count blue"><div class="yks-count-title"><strong>▣</strong> AYT'ye Kalan Süre</div><div class="yks-count-value">${aytDays} Gün</div><div class="yks-count-date">20 Haziran 2027</div></div>
+        <div class="yks-quote"><blockquote>“Başarı, her gün yapılan küçük şeylerin toplamıdır.”<cite>— Robert Collier</cite></blockquote></div>
+      </section>
 
-    <!-- İstatistik kartları -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px;">
-      ${[
-        {v:s.total,        l:"KONU BİTİRİLDİ", c:"#2ed573", id:"sTotalDone"},
-        {v:s.all-s.total,  l:"KONU KALDI",      c:"#5a6a7e", id:"sTotalLeft"},
-        {v:userData.xp,    l:"TOPLAM XP",       c:"#ffd60a", id:"sXP"},
-        {v:streak+" 🔥",   l:"GÜN SERİSİ",     c:"#a855f7", id:"sStreak"},
-        {v:streakRecord+"⭐",l:"SERİ REKORU",   c:"#14b8a6", id:"sStreakRecord"},
-      ].map(c=>`<div style="background:#14141f;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;text-align:center;">
-        <div id="${c.id}" style="font-size:2rem;font-weight:800;color:${c.c};margin-bottom:4px;">${c.v}</div>
-        <div style="font-family:monospace;font-size:0.62rem;letter-spacing:2px;color:#5a6a7e;">${c.l}</div>
-      </div>`).join("")}
-    </div>
+      <section class="yks-stats">
+        <div class="yks-stat"><div class="yks-stat-icon">◷</div><div class="yks-stat-label">Bugünkü Çalışma</div><div class="yks-stat-value">${fmtTime(todayTotalStudy())}</div><div class="yks-stat-note">↑ %12</div></div>
+        <div class="yks-stat"><div class="yks-stat-icon">▣</div><div class="yks-stat-label">Bu Haftaki Çalışma</div><div class="yks-stat-value">${fmtTime(weekSec)}</div><div class="yks-stat-note">↑ %25</div></div>
+        <div class="yks-stat"><div class="yks-stat-icon">▥</div><div class="yks-stat-label">Toplam Çalışma</div><div class="yks-stat-value">${fmtTime(totalStudy)}</div></div>
+        <div class="yks-stat"><div class="yks-stat-icon">🔥</div><div class="yks-stat-label">Çalışma Serisi</div><div class="yks-stat-value">${streak} Gün</div><div class="yks-stat-note">Harika gidiyorsun!</div></div>
+        <div class="yks-stat"><div class="yks-stat-icon">★</div><div class="yks-stat-label">Seviye</div><div class="yks-stat-value">Seviye ${level[1]+1}</div><div class="yks-stat-note" style="color:var(--text2)">${userData.xp||0} / ${level[2].min} XP</div></div>
+      </section>
 
-    <!-- Seviye & ilerleme -->
-    <div style="background:#14141f;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
-      <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;margin-bottom:16px;font-family:monospace;">SEVİYE & İLERLEME</div>
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
-        <div id="sLevelBadge" style="background:linear-gradient(135deg,#ffd60a,#ff9f00);color:#000;font-weight:800;
-          font-size:0.8rem;padding:6px 14px;border-radius:20px;white-space:nowrap;">LVL ${idx+1}</div>
-        <div style="flex:1;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-            <span id="sLevelName" style="font-family:monospace;font-size:0.72rem;color:#ffd60a;">${lvl.name}</span>
-            <span id="sXPLabel" style="font-family:monospace;font-size:0.72rem;color:#5a6a7e;">${userData.xp} / ${next.min} XP</span>
+      <section class="yks-main-grid">
+        <article class="yks-card">
+          <div class="yks-card-head">
+            <div><div class="yks-pro-title"><span class="bolt">ϟ</span><div><div class="yks-title">YKS Pro <span class="yks-pro-badge">⚡ PRO</span></div><div class="yks-subtitle">Hedeflerine giden yolda tüm araçlar burada!</div></div></div></div>
+            <button class="yks-btn-orange" onclick="document.getElementById('yksProMount')?.scrollIntoView({behavior:'smooth'})">Planı Düzenle</button>
           </div>
-          <div style="background:rgba(255,255,255,0.06);border-radius:100px;height:8px;overflow:hidden;">
-            <div id="xpBar" style="height:100%;border-radius:100px;transition:width 0.8s;width:${pct}%;background:linear-gradient(90deg,#ffd60a,#14b8a6);"></div>
+          <div class="yks-task-list">
+            <div class="yks-task"><div class="yks-checkbox done">✓</div><div class="yks-task-name">TYT Matematik – Problemler</div><div class="yks-task-time">40 dk</div></div>
+            <div class="yks-task"><div class="yks-checkbox done">✓</div><div class="yks-task-name">Paragraf – Soru Çözümü</div><div class="yks-task-time">30 dk</div></div>
+            <div class="yks-task"><div class="yks-checkbox"></div><div class="yks-task-name">AYT Matematik – Türev</div><div class="yks-task-time">45 dk</div></div>
+            <div class="yks-task"><div class="yks-checkbox"></div><div class="yks-task-name">Fizik – Elektrik ve Manyetizma</div><div class="yks-task-time">30 dk</div></div>
+            <div class="yks-task"><div class="yks-checkbox"></div><div class="yks-task-name">Yanlış analizi</div><div class="yks-task-time">20 dk</div></div>
           </div>
-        </div>
-      </div>
-      ${[{l:"TYT",p:tytPct,c:"#6366f1",bi:"tytBar",pi:"tytPct"},{l:"AYT",p:aytPct,c:"#14b8a6",bi:"aytBar",pi:"aytPct"}].map(b=>`
-      <div style="margin-top:12px;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-          <span style="font-family:monospace;font-size:0.72rem;color:${b.c};">${b.l}</span>
-          <span id="${b.pi}" style="font-family:monospace;font-size:0.72rem;color:#5a6a7e;">${b.p}%</span>
-        </div>
-        <div style="background:rgba(255,255,255,0.06);border-radius:100px;height:6px;overflow:hidden;">
-          <div id="${b.bi}" style="height:100%;border-radius:100px;width:${b.p}%;background:${b.c};transition:width 0.8s;"></div>
-        </div>
-      </div>`).join("")}
-    </div>
+        </article>
 
-    <!-- Haftalık Hedef -->
-    <div style="background:#14141f;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-        <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;font-family:monospace;">🎯 HAFTALIK ÇALIŞMA HEDEFİ</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-family:monospace;font-size:0.72rem;color:#5a6a7e;">Hedef:</span>
-          <input id="weeklyGoalInput" type="number" min="1" max="100" value="${userData.weeklyGoalHours||8}"
-            style="width:52px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
-            border-radius:6px;padding:4px 8px;color:#e8edf5;font-family:monospace;font-size:0.8rem;text-align:center;outline:none;">
-          <span style="font-family:monospace;font-size:0.72rem;color:#5a6a7e;">saat</span>
-        </div>
-      </div>
-      <div style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-          <span style="font-family:monospace;font-size:0.72rem;color:#2ed573;">${fmtTime(weekSec)} çalışıldı</span>
-          <span style="font-family:monospace;font-size:0.72rem;color:#5a6a7e;">${weekPct}% tamamlandı</span>
-        </div>
-        <div style="background:rgba(255,255,255,0.06);border-radius:100px;height:10px;overflow:hidden;">
-          <div style="height:100%;border-radius:100px;width:${weekPct}%;
-            background:linear-gradient(90deg,#2ed573,#6366f1);transition:width 0.8s;"></div>
-        </div>
-      </div>
-      <div style="font-family:monospace;font-size:0.7rem;color:#5a6a7e;">
-        Kalan: ${fmtTime(Math.max(0,weekGoalSec-weekSec))} &nbsp;·&nbsp; Bu haftanın son 7 günü sayılır
-      </div>
-    </div>
-
-    <!-- Seri -->
-    <div style="background:#14141f;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-        <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;font-family:monospace;">BU HAFTAKİ SERİ</div>
-        <div style="display:flex;gap:16px;">
-          <div style="font-family:monospace;font-size:0.75rem;color:#2ed573;">${streak} gün üst üste 🔥</div>
-          <div style="font-family:monospace;font-size:0.75rem;color:#14b8a6;">Rekor: ${streakRecord} gün ⭐</div>
-        </div>
-      </div>
-      <div id="streakRow" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;"></div>
-      <div style="margin-top:12px;font-size:0.78rem;color:#5a6a7e;font-family:monospace;">
-        💡 Her gün en az bir konu tiklersen serin devam eder.
-      </div>
-    </div>
-
-    <!-- Çalışma Kronometresi -->
-    <div style="background:#14141f;border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:24px;margin-bottom:20px;">
-      <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;margin-bottom:16px;font-family:monospace;">
-        ⏱ GÜNLÜK ÇALIŞMA KRONOMETRESİ
-      </div>
-      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:200px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <div id="timerDot" style="width:10px;height:10px;border-radius:50%;background:#2ed573;flex-shrink:0;"></div>
-            <div id="timerDisplay" style="font-family:monospace;font-size:2.5rem;font-weight:700;
-              color:#6366f1;letter-spacing:4px;">00:00:00</div>
+        <article class="yks-card">
+          <div class="yks-card-head">
+            <div><div class="yks-title">Çalışma Isı Haritası <span style="font-weight:500;color:#778496">(Son 56 Gün)</span></div><div class="yks-subtitle" style="color:var(--green)">● Düzenli çalışıyorsun! 🔥</div></div>
+            <button class="yks-btn-orange" onclick="document.getElementById('timerPanel')?.scrollIntoView({behavior:'smooth'})">Planı Düzenle</button>
           </div>
-          <div style="font-family:monospace;font-size:0.7rem;color:#5a6a7e;">
-            Bugün toplam: <span id="timerTodayTotal" style="color:#2ed573;">${fmtTime(todayTotalStudy())}</span>
+          <div class="yks-heat-wrap"><div class="yks-heat-grid-main" id="dashboardHeat"></div><div class="yks-heat-label"><span>Tem &nbsp;&nbsp;&nbsp;&nbsp; Ağu &nbsp;&nbsp;&nbsp;&nbsp; Eyl</span><span>Daha az&nbsp; <i class="yks-legend"></i><i class="yks-legend l1"></i><i class="yks-legend l2"></i><i class="yks-legend l3"></i><i class="yks-legend l4"></i> &nbsp;Daha fazla</span></div></div>
+          <div class="yks-mini-grid">
+            <div class="yks-mini"><div class="yks-mini-icon">◎</div><div class="yks-mini-value">${targetRank}</div><div class="yks-mini-note">Hedef Sıralama</div></div>
+            <div class="yks-mini"><div class="yks-mini-icon">▥</div><div class="yks-mini-value">TYT: ${targetTyt} · AYT: ${targetAyt}</div><div class="yks-mini-note">TYT / AYT Net Hedefi</div></div>
           </div>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button id="timerBtn" style="background:#2ed573;border:none;color:#000;
-            padding:12px 24px;border-radius:8px;font-weight:800;font-size:0.9rem;cursor:pointer;
-            font-family:monospace;letter-spacing:1px;">▶ Başlat</button>
-          <button id="timerResetBtn" style="background:transparent;border:1px solid rgba(255,255,255,0.1);
-            color:#5a6a7e;padding:12px 16px;border-radius:8px;font-size:0.9rem;cursor:pointer;
-            font-family:monospace;">↺ Sıfırla</button>
-        </div>
-      </div>
-    </div>
+        </article>
+      </section>
 
-    <!-- Ders Bazlı İlerleme (Pasta) -->
-    <div style="background:#14141f;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
-      <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;margin-bottom:16px;font-family:monospace;">
-        🍩 DERS BAZLI İLERLEME
-      </div>
-      <div id="donutSection" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
-    </div>
+      <section class="yks-lower-grid" id="statsPanel">
+        <article class="yks-card">
+          <div class="yks-title">Deneme Net Gelişimi</div><div class="yks-subtitle">Son kayıtların</div>
+          <div class="yks-chart-box" id="dashboardLineChart"></div>
+        </article>
+        <article class="yks-card">
+          <div class="yks-title">Konu Durumları</div><div class="yks-subtitle">Genel ilerleme</div>
+          <div id="dashboardDonut"></div>
+        </article>
+        <article class="yks-card" id="mistakesPanel">
+          <div class="yks-card-head"><div class="yks-title">Son Yanlışlar</div><span style="color:var(--accent);font-size:.62rem">Tümünü Gör</span></div>
+          <div class="yks-mistakes" id="dashboardMistakes"></div>
+        </article>
+      </section>
 
-    <!-- Motivasyon -->
-    <div style="background:linear-gradient(135deg,rgba(99,102,241,0.05),rgba(20,184,166,0.05));
-      border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:24px;">
-      <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#14b8a6);
-        display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:14px;">🤖</div>
-      <div style="font-size:1.1rem;line-height:1.75;border-left:3px solid #6366f1;padding-left:16px;
-        font-style:italic;font-weight:600;color:#e8edf5;">
-        ${MOTIVATION}</div>
+      <section class="yks-assistant-grid">
+        <article class="yks-card yks-assistant" id="yksAssistantPreview">
+          <div class="yks-card-head"><div><div class="yks-title">🤖 YKS Asistanı <span class="yks-pro-badge">⚡ PRO</span></div><div class="yks-subtitle">Sor, analiz et, daha iyi planla.</div></div></div>
+          <div class="yks-assistant-input"><input id="dashAssistantInput" class="yks-input-modern" placeholder="Örn: Matematikte problemlerim kötü, ne çalışmalıyım?"><button id="dashAssistantBtn" class="yks-send">➤</button></div>
+          <div id="dashAssistantAnswer" style="font-size:.7rem;color:#8794a5;margin-top:10px">Kısa öneri almak için bir soru yaz.</div>
+        </article>
+        <article class="yks-tiger-card">
+          <div class="yks-tiger-copy">Sınav değil,<br>hayal kazanacaksın.<small>Her gün küçük bir adım.</small></div>
+          <svg class="yks-tiger-art" viewBox="0 0 220 180" aria-hidden="true">
+            <path d="M43 65 30 27l38 19c22-14 59-14 81 0l38-19-12 39c13 17 18 38 15 61-5 31-29 52-64 52s-59-21-64-52c-3-23 2-44 15-61Z" fill="none" stroke="var(--accent)" stroke-width="5"/>
+            <path d="M64 73c14-18 58-18 72 0 9 12 9 29 2 48-8 20-23 32-38 32s-30-12-38-32c-7-19-7-36 2-48Z" fill="none" stroke="var(--accent)" stroke-width="4"/>
+            <path d="M80 79 67 67M140 79l13-12M87 83 73 96M133 83l14 13M82 102l-17 7M138 102l17 7M88 125l-14 17M132 125l14 17" stroke="var(--accent)" stroke-width="7" stroke-linecap="round"/>
+            <path d="M91 100c8-9 28-9 36 0l-4 24c-5 8-10 11-14 11s-9-3-14-11Z" fill="none" stroke="var(--accent)" stroke-width="4"/>
+            <path d="M101 108h16l-8 8Z" fill="var(--accent)"/>
+          </svg>
+        </article>
+      </section>
+
+      <section class="yks-card yks-timer-card" id="timerPanel">
+        <div class="yks-card-head"><div><div class="yks-title">⏱ Çalışma Zamanlayıcısı</div><div class="yks-subtitle">Çalışmanı ölç, serini koru.</div></div><div id="timerTodayTotal" style="color:var(--green);font-size:.7rem">${fmtTime(todayTotalStudy())}</div></div>
+        <div class="yks-timer-row"><div style="display:flex;align-items:center;gap:8px"><span id="timerDot" style="width:8px;height:8px;border-radius:50%;background:var(--green)"></span><div id="timerDisplay" class="yks-timer-display">00:00:00</div></div><div class="yks-timer-spacer"></div><button id="timerBtn" class="yks-btn-orange">▶ Başlat</button><button id="timerResetBtn" style="background:transparent;border:1px solid var(--border);color:#9ca8b8;padding:9px 13px;border-radius:9px;cursor:pointer">↺ Sıfırla</button></div>
+      </section>
+
+      <section id="goalsPanel" style="scroll-margin-top:20px"></section>
+      <section id="yksProMount" style="scroll-margin-top:20px"></section>
     </div>
   </div>`;
 
   attachNav("dashboard");
-  renderStats();
-  renderDonutSection();
 
-  document.getElementById("timerBtn").addEventListener("click", timerStartStop);
-  document.getElementById("timerResetBtn").addEventListener("click", timerReset);
-  if(timerRunning){
-    const btn=document.getElementById("timerBtn");
-    if(btn){ btn.textContent="⏸ Durdur"; btn.style.background="#ff4757"; }
-    const dot=document.getElementById("timerDot");
-    if(dot) dot.style.animation="pulse 1s infinite";
+  // Dashboard heatmap from actual study seconds.
+  const heat=document.getElementById("dashboardHeat"),study=userData.study||{};
+  if(heat){
+    let html="";
+    for(let i=55;i>=0;i--){
+      const d=new Date();d.setDate(d.getDate()-i);
+      const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      const sec=Number(study[k]||0),lv=sec<=0?0:sec<1800?1:sec<3600?2:sec<7200?3:4;
+      html+=`<div class="yks-heat-cell-main ${lv?`l${lv}`:""}" title="${k}: ${fmtTime(sec)}"></div>`;
+    }
+    heat.innerHTML=html;
   }
+
+  // Net chart from Pro records.
+  const pro=JSON.parse(localStorage.getItem("yksProData_v3")||localStorage.getItem("yksProData_v2")||"{}");
+  const sessions=(pro.sessions||[]).slice(-8), chart=document.getElementById("dashboardLineChart");
+  if(chart){
+    if(!sessions.length){chart.innerHTML='<div style="height:100%;display:grid;place-items:center;color:#728095;font-size:.7rem">Deneme ekledikçe grafik burada görünecek.</div>'}
+    else{
+      const vals=sessions.map(x=>Number(x.net)||0),max=Math.max(1,...vals),w=440,h=160,p=14;
+      const pts=vals.map((v,i)=>`${p+(i*(w-p*2)/Math.max(1,vals.length-1))},${h-p-(v/max)*(h-p*2)}`).join(" ");
+      chart.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><line x1="0" y1="35" x2="${w}" y2="35" stroke="rgba(148,163,184,.09)"/><line x1="0" y1="80" x2="${w}" y2="80" stroke="rgba(148,163,184,.09)"/><line x1="0" y1="125" x2="${w}" y2="125" stroke="rgba(148,163,184,.09)"/><polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${vals.map((v,i)=>{const x=p+(i*(w-p*2)/Math.max(1,vals.length-1));const y=h-p-(v/max)*(h-p*2);return `<circle cx="${x}" cy="${y}" r="4" fill="var(--accent)"/>`}).join("")}</svg>`;
+    }
+  }
+
+  const donut=document.getElementById("dashboardDonut");
+  if(donut){
+    const total=Math.max(1,st.all||1),done=st.total||0,pct=Math.min(100,Math.round(done/total*100));
+    donut.innerHTML=`<div class="yks-donut" style="background:conic-gradient(var(--green) 0 ${Math.max(1,pct)}%,var(--blue) ${Math.max(1,pct)}% 78%,var(--yellow) 78% 90%,var(--red) 90% 100%)"><span>${done}<br><small style="color:#778496">${total} Konu</small></span></div><div style="text-align:center;font-size:.65rem;color:#8290a1">İlerleme: ${pct}%</div>`;
+  }
+
+  const mistakes=document.getElementById("dashboardMistakes");
+  if(mistakes){
+    const list=pro.mistakes||[];
+    mistakes.innerHTML=list.length?list.slice(0,4).map(x=>`<div class="yks-mistake"><b>${escapeHtml(x.topic||"Konu")}</b><small>${escapeHtml(x.subject||"Ders")} · ${escapeHtml(x.next||"Tekrar")}</small></div>`).join(""):'<div style="color:#728095;font-size:.7rem;padding:12px 0">Henüz yanlış kaydı yok.</div>';
+  }
+
+  // Dashboard assistant uses the same local Pro data, without changing its existing assistant.
+  const ask=document.getElementById("dashAssistantInput"),answer=document.getElementById("dashAssistantAnswer");
+  if(ask&&answer){
+    const run=()=>{
+      const q=ask.value.toLocaleLowerCase("tr-TR"),weak=(pro.topics?Object.values(pro.topics):[]).filter(x=>x.level==="red").slice(0,3),pending=(pro.tasks||[]).filter(x=>!x.done).length;
+      let a=q.includes("mat")?"Matematik için 10 dk konu tekrarı + 30–45 dk soru çözümü + 10 dk yanlış analizi öneririm.":weak.length?`Önceliği eksik konularına ver: ${weak.map(x=>x.subject+" / "+x.topic).join(", ")}.`:`Planındaki ${pending} bekleyen görevden en önemlisini tamamla, sonra yanlış defterini tekrar et.`;
+      answer.textContent=a;
+    };
+    document.getElementById("dashAssistantBtn").addEventListener("click",run);
+    ask.addEventListener("keydown",e=>{if(e.key==="Enter")run()});
+  }
+
+  document.getElementById("timerBtn").addEventListener("click",timerStartStop);
+  document.getElementById("timerResetBtn").addEventListener("click",timerReset);
+  if(timerRunning){document.getElementById("timerBtn").textContent="⏸ Durdur"}
   timerTick();
 
-  // Weekly goal input
-  document.getElementById("weeklyGoalInput").addEventListener("change", e=>{
-    const v=parseInt(e.target.value)||8;
-    userData.weeklyGoalHours=Math.max(1,Math.min(100,v));
-    scheduleSave();
-    renderDashboard();
-  });
+  // Keep all existing Pro features in the dashboard only.
+  if(window.mountYksProDashboard) window.mountYksProDashboard();
 }
 
 function renderTopicsPage(){
@@ -1735,117 +1934,105 @@ async function renderAdminPage(){
 // ── PROFILE PAGE ──────────────────────────────────────────────
 function renderProfilePage(){
   document.getElementById("root").innerHTML=`
-  <div style="max-width:600px;margin:0 auto;padding:24px 20px;">
+  <div class="yks-app-shell">
     ${navHTML("profile")}
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#6366f1,#14b8a6,transparent);"></div>
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
-        <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#14b8a6);
-          display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;color:#000;font-weight:800;">
-          ${(userData.name||"?")[0].toUpperCase()}
+    <div class="yks-page-wrap">
+      <div class="yks-profile-layout">
+        <div class="yks-card" style="margin-bottom:13px">
+          <div class="yks-profile-tabs">
+            <button id="profileTabBtn" class="yks-profile-tab active">👤 Profil</button>
+            <button id="themeTabBtn" class="yks-profile-tab">🎨 Renk Teması</button>
+          </div>
+
+          <section id="profileTab">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px">
+              <div style="width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:850;font-size:1.35rem">${escapeHtml((userData.name||"?")[0].toUpperCase())}</div>
+              <div><div style="font-size:1.1rem;font-weight:850">${escapeHtml(userData.name||"")}</div><div style="font-size:.68rem;color:var(--text2)">${escapeHtml(currentUser?.email||"")}</div></div>
+            </div>
+            <div style="display:grid;gap:12px">
+              <div><div class="yks-subtitle" style="margin-bottom:6px">GÖRÜNEN İSİM</div><div style="display:flex;gap:8px"><input id="newName" class="yks-input-modern" value="${escapeHtml(userData.name||"")}" placeholder="Adın Soyadın"><button id="saveNameBtn" class="yks-btn-orange">Kaydet</button></div><div id="nameMsg" style="font-size:.68rem;min-height:17px;margin-top:5px"></div></div>
+              <div style="border-top:1px solid var(--border);padding-top:17px"><div class="yks-subtitle" style="margin-bottom:9px">ŞİFRE DEĞİŞTİR</div><div style="display:grid;gap:8px"><input id="currentPass" type="password" class="yks-input-modern" placeholder="Mevcut şifre"><input id="newPass" type="password" class="yks-input-modern" placeholder="Yeni şifre (en az 6 karakter)"><input id="newPass2" type="password" class="yks-input-modern" placeholder="Yeni şifre tekrar"><div id="passMsg" style="font-size:.68rem;min-height:17px"></div><button id="savePassBtn" class="yks-btn-orange">Şifreyi Değiştir</button></div></div>
+            </div>
+          </section>
+
+          <section id="themeTab" style="display:none">
+            <div class="yks-color-layout">
+              <div class="yks-color-card">
+                <div style="font-size:1rem;font-weight:850">Renk Teması</div>
+                <div style="font-size:.7rem;color:var(--text2);margin-top:4px">Turuncu alanların rengini tamamen kişiselleştir.</div>
+                <div class="yks-palette" id="themePalette"></div>
+                <div class="yks-color-row"><input id="customColor" type="color" value="${getYksAccent()}"><input id="customHex" class="hex yks-input-modern" value="${getYksAccent()}" placeholder="#ff7a1a"><button id="applyColorBtn" class="yks-btn-orange">Uygula</button></div>
+                <button id="resetColorBtn" style="width:100%;margin-top:9px;background:transparent;border:1px solid var(--border);color:#9aa6b6;padding:9px;border-radius:9px;cursor:pointer">Varsayılan Turuncu</button>
+              </div>
+              <div class="yks-color-card">
+                <div class="yks-subtitle">CANLI ÖNİZLEME</div>
+                <div style="font-size:1.35rem;font-weight:850;margin-top:8px">YKS Pro</div>
+                <div style="font-size:.7rem;color:var(--text2);margin-top:4px">Seçtiğin renk tüm vurgu alanlarına uygulanır.</div>
+                <div class="yks-preview-btn">Örnek Buton</div>
+                <div style="height:8px;background:#1a232d;border-radius:99px;margin-top:18px;overflow:hidden"><div style="width:73%;height:100%;background:var(--accent);border-radius:99px"></div></div>
+              </div>
+            </div>
+          </section>
         </div>
-        <div>
-          <div style="font-size:1.2rem;font-weight:800;color:var(--text);">${escapeHtml(userData.name||"")}</div>
-          <div style="font-family:monospace;font-size:0.75rem;color:var(--text2);">${escapeHtml(currentUser?.email||"")}</div>
+
+        <div class="yks-card" style="margin-bottom:13px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+            <div><div class="yks-title">Görünüm</div><div class="yks-subtitle">${isDark?"🌙 Karanlık mod aktif":"☀️ Aydınlık mod aktif"}</div></div>
+            <button id="themeToggleBtn" class="yks-btn-orange">${isDark?"☀️ Aydınlık Moda Geç":"🌙 Karanlık Moda Geç"}</button>
+          </div>
         </div>
-      </div>
-      <div style="margin-bottom:20px;">
-        <div style="font-family:monospace;font-size:0.65rem;color:var(--text2);margin-bottom:6px;letter-spacing:2px;">GÖRÜNEN İSİM</div>
-        <div style="display:flex;gap:8px;">
-          <input id="newName" type="text" value="${escapeHtml(userData.name||"")}" placeholder="Adın Soyadın"
-            style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;
-            padding:10px 14px;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none;">
-          <button id="saveNameBtn" style="background:#6366f1;border:none;color:#000;padding:10px 18px;
-            border-radius:8px;font-weight:800;cursor:pointer;font-family:monospace;font-size:0.8rem;white-space:nowrap;">Kaydet</button>
+
+        <div class="yks-card" style="border-color:rgba(255,104,118,.18)">
+          <div style="color:var(--red);font-size:.62rem;letter-spacing:1.5px;margin-bottom:8px">TEHLİKELİ ALAN</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <div><div class="yks-title">Tüm ilerlemeyi sıfırla</div><div class="yks-subtitle">Konu tikleri, XP ve serini siler. Geri alınamaz.</div></div>
+            <button id="resetAllBtn" style="background:transparent;border:1px solid var(--red);color:var(--red);padding:9px 14px;border-radius:9px;cursor:pointer">🗑 Sıfırla</button>
+          </div>
         </div>
-        <div id="nameMsg" style="font-family:monospace;font-size:0.75rem;margin-top:6px;min-height:18px;"></div>
-      </div>
-      <div style="border-top:1px solid var(--border);padding-top:20px;">
-        <div style="font-family:monospace;font-size:0.65rem;color:var(--text2);margin-bottom:12px;letter-spacing:2px;">ŞİFRE DEĞİŞTİR</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <input id="currentPass" type="password" placeholder="Mevcut şifre"
-            style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none;">
-          <input id="newPass" type="password" placeholder="Yeni şifre (en az 6 karakter)"
-            style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none;">
-          <input id="newPass2" type="password" placeholder="Yeni şifre tekrar"
-            style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none;">
-          <div id="passMsg" style="font-family:monospace;font-size:0.75rem;min-height:18px;"></div>
-          <button id="savePassBtn" style="background:linear-gradient(135deg,#6366f1,#0098cc);border:none;color:#000;
-            padding:11px;border-radius:8px;font-weight:800;cursor:pointer;font-size:0.9rem;">Şifreyi Değiştir</button>
-        </div>
-      </div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div style="font-weight:700;margin-bottom:4px;color:var(--text);">Tema</div>
-          <div style="font-family:monospace;font-size:0.75rem;color:var(--text2);">${isDark?"🌙 Karanlık mod aktif":"☀️ Aydınlık mod aktif"}</div>
-        </div>
-        <button id="themeToggleBtn" style="background:var(--bg3);border:1px solid var(--border2);
-          color:var(--text);padding:10px 20px;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;">
-          ${isDark?"☀️ Aydınlık Moda Geç":"🌙 Karanlık Moda Geç"}</button>
-      </div>
-    </div>
-    <div style="background:rgba(255,71,87,0.05);border:1px solid rgba(255,71,87,0.2);border-radius:12px;padding:20px;">
-      <div style="font-family:monospace;font-size:0.65rem;color:#ff4757;margin-bottom:12px;letter-spacing:2px;">TEHLİKELİ ALAN</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-        <div>
-          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px;color:var(--text);">Tüm ilerlemeyi sıfırla</div>
-          <div style="font-family:monospace;font-size:0.72rem;color:var(--text2);">Konu tikleri, XP ve serini siler. Geri alınamaz!</div>
-        </div>
-        <button id="resetAllBtn" style="background:transparent;border:1px solid #ff4757;color:#ff4757;
-          padding:9px 18px;border-radius:8px;cursor:pointer;font-family:monospace;font-size:0.75rem;font-weight:700;">🗑 Sıfırla</button>
       </div>
     </div>
   </div>`;
+
   attachNav("profile");
 
-  document.getElementById("saveNameBtn").addEventListener("click", async()=>{
-    const name=document.getElementById("newName").value.trim();
-    const msg=document.getElementById("nameMsg");
-    if(!name){ msg.style.color="#ff4757"; msg.textContent="İsim boş olamaz."; return; }
+  const palette=["#ff7a1a","#ff5c5c","#ffb020","#22c55e","#2dd4bf","#38bdf8","#6366f1","#a855f7","#ec4899","#ffffff"];
+  const pe=document.getElementById("themePalette");
+  pe.innerHTML=palette.map(c=>`<button class="yks-swatch ${c.toLowerCase()===getYksAccent().toLowerCase()?"active":""}" data-color="${c}" title="${c}" style="background:${c}"></button>`).join("");
+  pe.querySelectorAll("[data-color]").forEach(b=>b.addEventListener("click",()=>applyYksAccent(b.dataset.color,true)));
+  document.getElementById("customColor").addEventListener("input",e=>document.getElementById("customHex").value=e.target.value);
+  document.getElementById("applyColorBtn").addEventListener("click",()=>applyYksAccent(document.getElementById("customHex").value,true));
+  document.getElementById("resetColorBtn").addEventListener("click",()=>applyYksAccent("#ff7a1a",true));
+
+  document.getElementById("profileTabBtn").onclick=()=>{profileTab.style.display="";themeTab.style.display="none";profileTabBtn.classList.add("active");themeTabBtn.classList.remove("active")};
+  document.getElementById("themeTabBtn").onclick=()=>{profileTab.style.display="none";themeTab.style.display="";profileTabBtn.classList.remove("active");themeTabBtn.classList.add("active")};
+
+  document.getElementById("saveNameBtn").addEventListener("click",async()=>{
+    const name=document.getElementById("newName").value.trim(),msg=document.getElementById("nameMsg");
+    if(!name){msg.style.color=varRed();msg.textContent="İsim boş olamaz.";return}
+    try{await updateProfile(currentUser,{displayName:name});userData.name=name;scheduleSave();msg.style.color="var(--green)";msg.textContent="✅ İsim güncellendi!"}
+    catch(e){msg.style.color="var(--red)";msg.textContent="Hata: "+e.message}
+  });
+
+  document.getElementById("savePassBtn").addEventListener("click",async()=>{
+    const cur=document.getElementById("currentPass").value,np=document.getElementById("newPass").value,np2=document.getElementById("newPass2").value,msg=document.getElementById("passMsg");
+    if(!cur||!np||!np2){msg.style.color="var(--red)";msg.textContent="Tüm alanları doldur.";return}
+    if(np.length<6){msg.style.color="var(--red)";msg.textContent="Yeni şifre en az 6 karakter olmalı.";return}
+    if(np!==np2){msg.style.color="var(--red)";msg.textContent="Yeni şifreler eşleşmiyor.";return}
     try{
-      await updateProfile(currentUser,{displayName:name});
-      userData.name=name; scheduleSave();
-      msg.style.color="#2ed573"; msg.textContent="✅ İsim güncellendi!";
-    } catch(e){ msg.style.color="#ff4757"; msg.textContent="Hata: "+e.message; }
+      const {EmailAuthProvider,reauthenticateWithCredential,updatePassword}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+      await reauthenticateWithCredential(currentUser,EmailAuthProvider.credential(currentUser.email,cur));
+      await updatePassword(currentUser,np);msg.style.color="var(--green)";msg.textContent="✅ Şifre başarıyla değiştirildi!";
+      ["currentPass","newPass","newPass2"].forEach(id=>document.getElementById(id).value="");
+    }catch(e){msg.style.color="var(--red)";msg.textContent=e.code==="auth/wrong-password"||e.code==="auth/invalid-credential"?"Mevcut şifre yanlış.":"Hata: "+e.message}
   });
 
-  document.getElementById("savePassBtn").addEventListener("click", async()=>{
-    const cur=document.getElementById("currentPass").value;
-    const np=document.getElementById("newPass").value;
-    const np2=document.getElementById("newPass2").value;
-    const msg=document.getElementById("passMsg");
-    if(!cur||!np||!np2){ msg.style.color="#ff4757"; msg.textContent="Tüm alanları doldur."; return; }
-    if(np.length<6){ msg.style.color="#ff4757"; msg.textContent="Yeni şifre en az 6 karakter olmalı."; return; }
-    if(np!==np2){ msg.style.color="#ff4757"; msg.textContent="Yeni şifreler eşleşmiyor."; return; }
-    try{
-      const {EmailAuthProvider, reauthenticateWithCredential, updatePassword} =
-        await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-      const credential=EmailAuthProvider.credential(currentUser.email, cur);
-      await reauthenticateWithCredential(currentUser, credential);
-      await updatePassword(currentUser, np);
-      msg.style.color="#2ed573"; msg.textContent="✅ Şifre başarıyla değiştirildi!";
-      document.getElementById("currentPass").value="";
-      document.getElementById("newPass").value="";
-      document.getElementById("newPass2").value="";
-    } catch(e){
-      msg.style.color="#ff4757";
-      if(e.code==="auth/wrong-password"||e.code==="auth/invalid-credential") msg.textContent="Mevcut şifre yanlış.";
-      else msg.textContent="Hata: "+e.message;
-    }
-  });
-
-  document.getElementById("themeToggleBtn").addEventListener("click",()=>{ toggleTheme(); renderProfilePage(); });
-
-  document.getElementById("resetAllBtn").addEventListener("click",()=>{
-    if(!confirm("Tüm ilerleme silinecek. Bunu geri alamazsın. Emin misin?")) return;
-    userData.done={}; userData.xp=0; userData.streak=[]; userData.streakRecord=0;
-    scheduleSave();
-    alert("✅ İlerleme sıfırlandı.");
-    setPage("dashboard");
-  });
+  document.getElementById("themeToggleBtn").onclick=()=>{toggleTheme();renderProfilePage()};
+  document.getElementById("resetAllBtn").onclick=()=>{
+    if(!confirm("Tüm ilerleme silinecek. Bunu geri alamazsın. Emin misin?"))return;
+    userData.done={};userData.xp=0;userData.streak=[];userData.streakRecord=0;scheduleSave();alert("✅ İlerleme sıfırlandı.");setPage("dashboard");
+  };
 }
+function varRed(){return "var(--red)"}
 
 // ── REWARD ────────────────────────────────────────────────────
 document.getElementById("rewardBtn").addEventListener("click", closeReward);
@@ -1857,5 +2044,276 @@ document.addEventListener("DOMContentLoaded",()=>{
   showLoading("YKS yükleniyor...");
 });
 </script>
+
+<script id="yks-pro-enhancements-js">
+(function(){
+"use strict";
+const KEY="yksProData_v2";
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{tasks:[],mistakes:[],topics:{},sessions:[],targetRank:"",targetNet:"",assistant:[]}}catch(e){return {tasks:[],mistakes:[],topics:{},sessions:[],assistant:[]}}};
+let D=load();
+const save=()=>localStorage.setItem(KEY,JSON.stringify(D));
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const today=()=>{const d=new Date();return d.toISOString().slice(0,10)};
+const addDays=(date,n)=>{const d=new Date(date+"T12:00:00");d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+function mount(){
+ if(document.getElementById("yksProFeatures")) return;
+ const host=document.querySelector("main")||document.querySelector(".container")||document.body;
+ const root=document.createElement("section"); root.id="yksProFeatures";
+ root.innerHTML=`
+ <div class="yks-section-title"><div><h2 style="margin:0">YKS Pro Panel</h2><div class="yks-muted">Planını, eksiklerini ve gelişimini tek yerden takip et.</div></div></div>
+ <div class="yks-pro-grid">
+  <article class="yks-card wide">
+   <div class="yks-section-title"><div><h3>🎯 Bugünün Akıllı Planı</h3><div class="yks-muted">Görevleri tamamladıkça ilerlemen otomatik kaydolur.</div></div><button class="yks-btn primary" data-act="seed">Plan Oluştur</button></div>
+   <div id="yksTasks"></div>
+  </article>
+  <article class="yks-card">
+   <h3>📊 Hedef Paneli</h3>
+   <div class="yks-form">
+    <label class="fullrow"><span class="yks-muted">Hedef sıralama</span><input class="yks-input" id="yksRank" placeholder="Örn. 50000"></label>
+    <label><span class="yks-muted">Hedef TYT net</span><input class="yks-input" id="yksTyt" type="number" placeholder="90"></label>
+    <label><span class="yks-muted">Hedef AYT net</span><input class="yks-input" id="yksAyt" type="number" placeholder="60"></label>
+   </div>
+   <div class="yks-actions"><button class="yks-btn primary" data-act="goal">Kaydet</button></div>
+   <div id="yksGoalOut" class="yks-muted" style="margin-top:10px"></div>
+  </article>
+  <article class="yks-card wide">
+   <div class="yks-section-title"><div><h3>📝 Yanlış Defteri</h3><div class="yks-muted">Yanlışlarını kaydet, tekrar tarihini takip et.</div></div></div>
+   <div class="yks-form">
+    <input class="yks-input" id="mSubject" placeholder="Ders">
+    <input class="yks-input" id="mTopic" placeholder="Konu">
+    <input class="yks-input fullrow" id="mReason" placeholder="Neden yanlış yaptım?">
+    <textarea class="yks-textarea fullrow" id="mNote" rows="2" placeholder="Doğru çözüm / kısa not"></textarea>
+   </div>
+   <div class="yks-actions"><button class="yks-btn primary" data-act="mistake">Yanlışı Kaydet</button></div>
+   <div id="yksMistakes" class="yks-list"></div>
+  </article>
+  <article class="yks-card">
+   <h3>📚 Konu Durumu</h3>
+   <div class="yks-form">
+    <input class="yks-input" id="tSubject" placeholder="Ders">
+    <input class="yks-input" id="tTopic" placeholder="Konu">
+    <select class="yks-select" id="tLevel"><option value="red">Eksik</option><option value="yellow">Geliştirilmeli</option><option value="green">İyi</option></select>
+   </div>
+   <div class="yks-actions"><button class="yks-btn primary" data-act="topic">Güncelle</button></div>
+   <div id="yksTopics" class="yks-list"></div>
+  </article>
+  <article class="yks-card wide">
+   <h3>📈 Net Gelişimi</h3><div class="yks-muted">Buraya deneme netlerini hızlıca ekleyebilirsin.</div>
+   <div class="yks-form" style="margin-top:12px"><input class="yks-input" id="sDate" type="date"><input class="yks-input" id="sNet" type="number" step=".01" placeholder="Toplam net"></div>
+   <div class="yks-actions"><button class="yks-btn primary" data-act="session">Denemeyi Ekle</button></div>
+   <div id="yksChart" class="yks-chart"></div>
+  </article>
+  <article class="yks-card full">
+   <div class="yks-section-title"><div><h3>🔥 Çalışma Isı Haritası</h3><div class="yks-muted">Son 56 gün · çalışma oturumlarını yerelde görselleştirir.</div></div></div>
+   <div id="yksHeat" class="yks-heatmap"></div>
+  </article>
+  <article class="yks-card full yks-ai">
+   <h3>🤖 YKS Asistanı</h3>
+   <div class="yks-muted">Verilerini analiz eden basit yerel öneri motoru. Hesap bilgilerine erişmez.</div>
+   <div class="yks-form" style="margin-top:12px"><input class="yks-input fullrow" id="yksAsk" placeholder="Örn. Bugün ne çalışmalıyım?"></div>
+   <div class="yks-actions"><button class="yks-btn primary" data-act="ask">Öneri Al</button></div>
+   <div id="yksAnswer" class="yks-item" style="margin-top:12px"><div class="grow">Henüz soru sorulmadı.</div></div>
+  </article>
+ </div>`;
+ host.appendChild(root);
+ bind(); render();
+}
+function seed(){
+ const base=[
+  ["TYT Matematik","Problemler","45 dk"],
+  ["TYT Türkçe","Paragraf","30 soru"],
+  ["AYT Matematik","Türev / eksik konu","45 dk"],
+  ["Genel","Yanlış analizi","20 dk"]
+ ];
+ D.tasks=base.map((x,i)=>({id:Date.now()+i,title:x[0]+" — "+x[1],detail:x[2],done:false}));
+ save();renderTasks();
+}
+function renderTasks(){
+ const el=document.getElementById("yksTasks"); if(!el)return;
+ if(!D.tasks.length){el.innerHTML='<div class="yks-empty">Henüz plan yok. “Plan Oluştur” ile başlayabilirsin.</div>';return}
+ const done=D.tasks.filter(x=>x.done).length,pct=Math.round(done/D.tasks.length*100);
+ el.innerHTML='<div class="yks-progress"><span style="width:'+pct+'%"></span></div>'+
+ D.tasks.map(x=>`<div class="yks-item"><input class="yks-check" type="checkbox" ${x.done?'checked':''} data-task="${x.id}"><div class="grow"><b>${esc(x.title)}</b><br><small>${esc(x.detail)}</small></div><span class="yks-tag">${x.done?'Tamamlandı':'Planlandı'}</span></div>`).join("");
+ el.querySelectorAll("[data-task]").forEach(c=>c.onchange=()=>{const t=D.tasks.find(x=>x.id==c.dataset.task);if(t){t.done=c.checked;save();renderTasks()}});
+}
+function addMistake(){
+ const subject=document.getElementById("mSubject").value.trim(),topic=document.getElementById("mTopic").value.trim(),reason=document.getElementById("mReason").value.trim(),note=document.getElementById("mNote").value.trim();
+ if(!subject||!topic)return alert("Ders ve konu alanlarını doldur.");
+ D.mistakes.unshift({id:Date.now(),subject,topic,reason,note,next:addDays(today(),2),done:false});save();["mSubject","mTopic","mReason","mNote"].forEach(id=>document.getElementById(id).value="");render();
+}
+function renderMistakes(){
+ const el=document.getElementById("yksMistakes");if(!el)return;
+ el.innerHTML=D.mistakes.length?D.mistakes.slice(0,20).map(x=>`<div class="yks-item"><div class="grow"><b>${esc(x.subject)} · ${esc(x.topic)}</b><br><small>${esc(x.reason||"Neden belirtilmedi")} · Tekrar: ${esc(x.next)}</small>${x.note?`<br><small>${esc(x.note)}</small>`:""}</div><button class="yks-btn ${x.done?'':'primary'}" data-m="${x.id}">${x.done?'✓':'Tekrar'}</button></div>`).join(""):'<div class="yks-empty">Henüz yanlış eklenmedi.</div>';
+ el.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{const x=D.mistakes.find(x=>x.id==b.dataset.m);if(x){x.done=true;x.next=addDays(today(),7);save();renderMistakes()}});
+}
+function addTopic(){
+ const s=document.getElementById("tSubject").value.trim(),t=document.getElementById("tTopic").value.trim(),l=document.getElementById("tLevel").value;if(!s||!t)return alert("Ders ve konu alanlarını doldur.");D.topics[s+"|"+t]={subject:s,topic:t,level:l};save();renderTopics();
+}
+function renderTopics(){
+ const el=document.getElementById("yksTopics");if(!el)return;const a=Object.values(D.topics);
+ el.innerHTML=a.length?a.map(x=>`<div class="yks-item"><div class="grow"><b>${esc(x.subject)} · ${esc(x.topic)}</b></div><span class="yks-tag ${x.level}">${x.level==="red"?"Eksik":x.level==="yellow"?"Geliştirilmeli":"İyi"}</span></div>`).join(""):'<div class="yks-empty">Konu durumlarını buradan ekleyebilirsin.</div>';
+}
+function addSession(){
+ const date=document.getElementById("sDate").value||today(),net=Number(document.getElementById("sNet").value);if(!Number.isFinite(net)||net<0)return alert("Geçerli bir net gir.");
+ D.sessions.push({date,net});D.sessions=D.sessions.slice(-30);save();renderChart();renderHeat();
+}
+function renderChart(){
+ const el=document.getElementById("yksChart");if(!el)return;const a=D.sessions.slice(-14),max=Math.max(1,...a.map(x=>x.net));
+ el.innerHTML=a.length?a.map(x=>`<div class="yks-bar" style="height:${Math.max(5,x.net/max*92)}%" title="${esc(x.date)}: ${x.net} net"><span>${x.net}</span></div>`).join(""):'<div class="yks-empty" style="width:100%">Henüz deneme verisi yok.</div>';
+}
+function renderHeat(){
+ const el=document.getElementById("yksHeat");if(!el)return;
+ const map={};D.sessions.forEach(x=>{map[x.date]=(map[x.date]||0)+1});
+ let out="";for(let i=55;i>=0;i--){const d=addDays(today(),-i),n=map[d]||0;out+=`<div class="yks-day" data-level="${Math.min(4,n)}" title="${d}: ${n} kayıt"></div>`}el.innerHTML=out;
+}
+function renderGoal(){
+ const r=document.getElementById("yksRank"),t=document.getElementById("yksTyt"),a=document.getElementById("yksAyt"),o=document.getElementById("yksGoalOut");if(!r)return;
+ r.value=D.targetRank||"";t.value=D.targetTyt||"";a.value=D.targetAyt||"";
+ o.textContent=D.targetRank?`Hedef sıralaman: ${D.targetRank} · TYT: ${D.targetTyt||"—"} · AYT: ${D.targetAyt||"—"}`:"Henüz hedef kaydedilmedi.";
+}
+function saveGoal(){D.targetRank=document.getElementById("yksRank").value.trim();D.targetTyt=document.getElementById("yksTyt").value;D.targetAyt=document.getElementById("yksAyt").value;save();renderGoal()}
+function ask(){
+ const q=document.getElementById("yksAsk").value.toLowerCase(),o=document.getElementById("yksAnswer"),weak=Object.values(D.topics).filter(x=>x.level==="red").slice(0,3),pending=D.tasks.filter(x=>!x.done).length;
+ let ans;
+ if(q.includes("bugün")||q.includes("çalış")) ans=weak.length?`Önceliği eksik konularına ver: ${weak.map(x=>x.subject+" / "+x.topic).join(", ")}. Ardından ${pending} plan görevinden kalanları tamamla.`:`Önce planındaki görevleri tamamla; ardından son denemendeki yanlışlarını tekrar et.`;
+ else if(q.includes("mat")) ans="Matematik için kısa bir blok önerisi: 10 dk konu tekrarı + 30–45 dk soru çözümü + 10 dk yanlış analizi.";
+ else if(q.includes("yanlış")) ans=D.mistakes.length?`Yanlış defterinde ${D.mistakes.length} kayıt var. Bugün tekrar tarihi gelenleri gözden geçir.`:"Önce yanlış defterine birkaç kayıt ekle; böylece tekrar planı oluşturabilirsin.";
+ else ans="Sorunu biraz daha açık yaz. Örneğin “Bugün ne çalışmalıyım?”, “Matematik için plan yap” veya “Yanlışlarımı nasıl tekrar edeyim?”";
+ o.innerHTML=`<div class="grow">${esc(ans)}</div>`;
+}
+function bind(){
+ document.querySelectorAll("#yksProFeatures [data-act]").forEach(b=>b.onclick=()=>({seed,goal:saveGoal,mistake:addMistake,topic:addTopic,session:addSession,ask})[b.dataset.act]());
+ const sd=document.getElementById("sDate");if(sd)sd.value=today();
+}
+function render(){renderTasks();renderMistakes();renderTopics();renderChart();renderHeat();renderGoal()}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mount);else mount();
+})();
+</script>
+
+
+
+<script id="yks-pro-dashboard-panel-v3">
+(function(){
+"use strict";
+const KEY="yksProData_v3";
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{tasks:[],mistakes:[],topics:{},sessions:[],targetRank:"",targetTyt:"",targetAyt:""}}catch(e){return {tasks:[],mistakes:[],topics:{},sessions:[]}}};
+let D=load();
+const save=()=>localStorage.setItem(KEY,JSON.stringify(D));
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const localDate=(d=new Date())=>{const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`};
+const addDays=(date,n)=>{const d=new Date(date+"T12:00:00");d.setDate(d.getDate()+n);return localDate(d)};
+
+function panelMarkup(){
+return `<section id="yksProFeatures" aria-label="YKS Pro Panel">
+ <div class="yks-section-title"><div><h2 style="margin:0">⚡ YKS Pro Panel</h2><div class="yks-muted">Plan, tekrar, deneme ve gelişim araçların.</div></div></div>
+ <div class="yks-pro-grid">
+  <article class="yks-card wide">
+   <div class="yks-section-title"><div><h3>🎯 Bugünün Akıllı Çalışma Planı</h3><div class="yks-muted">Hazır planı tek tıkla oluştur, tamamladıkça ilerle.</div></div><button class="yks-btn primary" data-ypro="seed">Plan Oluştur</button></div>
+   <div id="yksTasks"></div>
+  </article>
+  <article class="yks-card">
+   <h3>🏆 Hedefler</h3>
+   <div class="yks-form">
+    <label class="fullrow"><span class="yks-muted">Hedef sıralama</span><input class="yks-input" id="yksRank" placeholder="Örn. 50000"></label>
+    <label><span class="yks-muted">TYT net</span><input class="yks-input" id="yksTyt" type="number" step=".1" placeholder="90"></label>
+    <label><span class="yks-muted">AYT net</span><input class="yks-input" id="yksAyt" type="number" step=".1" placeholder="60"></label>
+   </div>
+   <div class="yks-actions"><button class="yks-btn primary" data-ypro="goal">Kaydet</button></div>
+   <div id="yksGoalOut" class="yks-muted" style="margin-top:10px"></div>
+  </article>
+  <article class="yks-card wide">
+   <div class="yks-section-title"><div><h3>📝 Yanlış Defteri + Akıllı Tekrar</h3><div class="yks-muted">Yanlışın nedenini yaz; tekrar tarihini takip et.</div></div></div>
+   <div class="yks-form">
+    <input class="yks-input" id="mSubject" placeholder="Ders">
+    <input class="yks-input" id="mTopic" placeholder="Konu">
+    <input class="yks-input fullrow" id="mReason" placeholder="Neden yanlış yaptım?">
+    <textarea class="yks-textarea fullrow" id="mNote" rows="2" placeholder="Doğru çözüm / kısa not"></textarea>
+   </div>
+   <div class="yks-actions"><button class="yks-btn primary" data-ypro="mistake">Yanlışı Kaydet</button></div>
+   <div id="yksMistakes" class="yks-list"></div>
+  </article>
+  <article class="yks-card">
+   <h3>📚 Konu Durumu</h3>
+   <div class="yks-form">
+    <input class="yks-input" id="tSubject" placeholder="Ders">
+    <input class="yks-input" id="tTopic" placeholder="Konu">
+    <select class="yks-select" id="tLevel"><option value="red">Eksik</option><option value="yellow">Geliştirilmeli</option><option value="green">İyi</option></select>
+   </div>
+   <div class="yks-actions"><button class="yks-btn primary" data-ypro="topic">Güncelle</button></div>
+   <div id="yksTopics" class="yks-list"></div>
+  </article>
+  <article class="yks-card wide">
+   <h3>📈 Deneme Net Gelişimi</h3><div class="yks-muted">Denemelerini ekledikçe trendini gör.</div>
+   <div class="yks-form" style="margin-top:12px"><input class="yks-input" id="sDate" type="date"><input class="yks-input" id="sNet" type="number" step=".01" placeholder="Toplam net"></div>
+   <div class="yks-actions"><button class="yks-btn primary" data-ypro="session">Denemeyi Ekle</button></div>
+   <div id="yksChart" class="yks-chart"></div>
+  </article>
+  <article class="yks-card full">
+   <div class="yks-section-title"><div><h3>🔥 56 Günlük Çalışma Isı Haritası</h3><div class="yks-muted">Deneme kayıtlarının yanı sıra çalışma günlerini de görselleştir.</div></div></div>
+   <div id="yksHeat" class="yks-heatmap"></div>
+  </article>
+  <article class="yks-card full yks-ai">
+   <h3>🤖 YKS Asistanı</h3><div class="yks-muted">Kayıtlı hedef, konu ve yanlışlarına göre yerel öneri üretir.</div>
+   <div class="yks-form" style="margin-top:12px"><input class="yks-input fullrow" id="yksAsk" placeholder="Örn. Bugün ne çalışmalıyım?"></div>
+   <div class="yks-actions"><button class="yks-btn primary" data-ypro="ask">Öneri Al</button></div>
+   <div id="yksAnswer" class="yks-item" style="margin-top:12px"><div class="grow">Bir soru yaz ve öneri al.</div></div>
+  </article>
+ </div>
+</section>`}
+
+function seed(){
+ D.tasks=[
+  {id:Date.now(),title:"TYT Matematik — Problemler",detail:"45 dk",done:false},
+  {id:Date.now()+1,title:"TYT Türkçe — Paragraf",detail:"30 soru",done:false},
+  {id:Date.now()+2,title:"AYT Matematik — Eksik konu",detail:"45 dk",done:false},
+  {id:Date.now()+3,title:"Yanlış analizi",detail:"20 dk",done:false}
+ ];save();renderAll()
+}
+function renderTasks(){const el=document.getElementById("yksTasks");if(!el)return;const a=D.tasks||[],done=a.filter(x=>x.done).length,p=a.length?Math.round(done/a.length*100):0;el.innerHTML=(a.length?`<div class="yks-progress"><span style="width:${p}%"></span></div>`:"")+ (a.length?a.map(x=>`<div class="yks-item"><input class="yks-check" type="checkbox" ${x.done?"checked":""} data-ytask="${x.id}"><div class="grow"><b>${esc(x.title)}</b><br><small>${esc(x.detail)}</small></div><span class="yks-tag ${x.done?"green":""}">${x.done?"Tamamlandı":"Planlandı"}</span></div>`).join(""):'<div class="yks-empty">Plan oluşturmak için yukarıdaki butona bas.</div>');el.querySelectorAll("[data-ytask]").forEach(c=>c.onchange=()=>{const t=a.find(x=>String(x.id)===String(c.dataset.ytask));if(t){t.done=c.checked;save();renderTasks()}})}
+function addMistake(){const s=mSubject.value.trim(),t=mTopic.value.trim();if(!s||!t)return alert("Ders ve konu alanlarını doldur.");D.mistakes=[{id:Date.now(),subject:s,topic:t,reason:mReason.value.trim(),note:mNote.value.trim(),next:addDays(localDate(),2),done:false},...(D.mistakes||[])].slice(0,100);save();mSubject.value=mTopic.value=mReason.value=mNote.value="";renderMistakes()}
+function renderMistakes(){const el=document.getElementById("yksMistakes");if(!el)return;const a=D.mistakes||[];el.innerHTML=a.length?a.slice(0,15).map(x=>`<div class="yks-item"><div class="grow"><b>${esc(x.subject)} · ${esc(x.topic)}</b><br><small>${esc(x.reason||"Neden belirtilmedi")} · Tekrar: ${esc(x.next)}</small>${x.note?`<br><small>${esc(x.note)}</small>`:""}</div><button class="yks-btn ${x.done?"":"primary"}" data-ym="${x.id}">${x.done?"✓ Tekrarlandı":"Tekrar"}</button></div>`).join(""):'<div class="yks-empty">Henüz yanlış kaydı yok.</div>';el.querySelectorAll("[data-ym]").forEach(b=>b.onclick=()=>{const x=a.find(v=>String(v.id)===String(b.dataset.ym));if(x){x.done=true;x.next=addDays(localDate(),7);save();renderMistakes()}})}
+function addTopic(){const s=tSubject.value.trim(),t=tTopic.value.trim();if(!s||!t)return alert("Ders ve konu alanlarını doldur.");D.topics=D.topics||{};D.topics[s+"|"+t]={subject:s,topic:t,level:tLevel.value};save();renderTopics()}
+function renderTopics(){const el=document.getElementById("yksTopics");if(!el)return;const a=Object.values(D.topics||{});el.innerHTML=a.length?a.map(x=>`<div class="yks-item"><div class="grow"><b>${esc(x.subject)} · ${esc(x.topic)}</b></div><span class="yks-tag ${x.level}">${x.level==="red"?"Eksik":x.level==="yellow"?"Geliştirilmeli":"İyi"}</span></div>`).join(""):'<div class="yks-empty">Konu durumlarını ekleyebilirsin.</div>'}
+function addSession(){const n=Number(sNet.value);if(!Number.isFinite(n)||n<0)return alert("Geçerli bir net gir.");D.sessions=[...(D.sessions||[]),{date:sDate.value||localDate(),net:n}].slice(-30);save();renderChart();renderHeat()}
+function renderChart(){const el=document.getElementById("yksChart");if(!el)return;const a=(D.sessions||[]).slice(-14),max=Math.max(1,...a.map(x=>x.net));el.innerHTML=a.length?a.map(x=>`<div class="yks-bar" style="height:${Math.max(5,x.net/max*92)}%" title="${esc(x.date)}: ${x.net} net"><span>${x.net}</span></div>`).join(""):'<div class="yks-empty" style="width:100%">Henüz deneme verisi yok.</div>'}
+function renderHeat(){const el=document.getElementById("yksHeat");if(!el)return;const map={};(D.sessions||[]).forEach(x=>map[x.date]=(map[x.date]||0)+1);let o="";for(let i=55;i>=0;i--){const d=addDays(localDate(),-i),n=map[d]||0;o+=`<div class="yks-day" data-level="${Math.min(4,n)}" title="${d}: ${n} kayıt"></div>`}el.innerHTML=o}
+function renderGoal(){const o=document.getElementById("yksGoalOut");if(!o)return;yksRank.value=D.targetRank||"";yksTyt.value=D.targetTyt||"";yksAyt.value=D.targetAyt||"";o.textContent=D.targetRank?`Hedef: ${D.targetRank} sıralama · TYT ${D.targetTyt||"—"} · AYT ${D.targetAyt||"—"}`:"Henüz hedef kaydedilmedi."}
+function saveGoal(){D.targetRank=yksRank.value.trim();D.targetTyt=yksTyt.value;D.targetAyt=yksAyt.value;save();renderGoal()}
+function ask(){const q=yksAsk.value.toLocaleLowerCase("tr-TR"),weak=Object.values(D.topics||{}).filter(x=>x.level==="red"),pending=(D.tasks||[]).filter(x=>!x.done).length;let a;if(q.includes("bugün")||q.includes("çalış"))a=weak.length?`Öncelik eksik konuların: ${weak.slice(0,3).map(x=>x.subject+" / "+x.topic).join(", ")}. Sonra kalan ${pending} plan görevinden en önemlisini tamamla.`:`Önce planındaki ${pending} görevi tamamla; ardından yanlış defterinden tekrar tarihi gelenleri çalış.`;else if(q.includes("mat"))a="Matematik için: 10 dk konu tekrarı + 30–45 dk soru çözümü + 10 dk yanlış analizi.";else if(q.includes("yanlış"))a=(D.mistakes||[]).length?`Yanlış defterinde ${(D.mistakes||[]).length} kayıt var. Tekrar tarihi gelenlerden başla.`:"Yanlış defterine kayıt ekleyerek tekrar sistemini kullanabilirsin.";else a="Örnek sorular: “Bugün ne çalışmalıyım?”, “Matematik için plan yap”, “Yanlışlarımı nasıl tekrar edeyim?”";yksAnswer.innerHTML=`<div class="grow">${esc(a)}</div>`}
+function bind(){document.querySelectorAll("#yksProFeatures [data-ypro]").forEach(b=>b.onclick=()=>({seed,goal:saveGoal,mistake:addMistake,topic:addTopic,session:addSession,ask})[b.dataset.ypro]());sDate.value=localDate()}
+function renderAll(){renderTasks();renderMistakes();renderTopics();renderChart();renderHeat();renderGoal()}
+window.mountYksProDashboard=function(){
+ if(typeof activePage!=="undefined"&&activePage!=="dashboard")return;
+ const host=document.querySelector("#yksProMount");
+ if(!host)return;
+ host.innerHTML=panelMarkup();bind();renderAll();
+};
+})();
+</script>
+
+
+<script id="yks-theme-personalization-final">
+(function(){
+  const KEY="yksAccentColor";
+  function rgb(hex){const m=String(hex).match(/[0-9a-f]{2}/gi);return m?m.map(x=>parseInt(x,16)):[255,122,26]}
+  function apply(hex){
+    const r=rgb(hex);
+    document.documentElement.style.setProperty("--accent",hex);
+    document.documentElement.style.setProperty("--accent2",`rgb(${Math.min(255,r[0]+35)},${Math.min(255,r[1]+35)},${Math.min(255,r[2]+35)})`);
+    document.documentElement.style.setProperty("--accent-rgb",r.join(","));
+  }
+  window.getYksAccent=()=>localStorage.getItem(KEY)||"#ff7a1a";
+  window.applyYksAccent=(hex,save=true)=>{
+    hex=String(hex||"").trim();
+    if(!/^#[0-9a-f]{6}$/i.test(hex)){alert("Geçerli bir HEX renk gir. Örnek: #ff7a1a");return}
+    apply(hex);if(save)localStorage.setItem(KEY,hex);
+    const c=document.getElementById("customColor"),h=document.getElementById("customHex");
+    if(c)c.value=hex;if(h)h.value=hex;
+    document.querySelectorAll(".yks-swatch").forEach(x=>x.classList.toggle("active",x.dataset.color.toLowerCase()===hex.toLowerCase()));
+  };
+  apply(window.getYksAccent());
+})();
+</script>
+
 </body>
 </html>

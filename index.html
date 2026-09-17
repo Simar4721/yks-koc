@@ -1,5 +1,7 @@
 
 
+Site · HTML
+ 
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -42,7 +44,7 @@ input{font-family:inherit;}
 </head>
 <body>
 <div id="root"></div>
-
+ 
 <div id="rewardOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);
   display:flex;align-items:center;justify-content:center;z-index:1000;
   opacity:0;pointer-events:none;transition:opacity 0.3s;">
@@ -58,14 +60,14 @@ input{font-family:inherit;}
       DEVAM ET 💪</button>
   </div>
 </div>
-
+ 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, browserSessionPersistence, setPersistence, sendPasswordResetEmail }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, getDocs, collection }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+ 
 const firebaseConfig = {
   apiKey: "AIzaSyBTcsGoXARld4-IQpzst-27bNzzHTJMGbU",
   authDomain: "ykskoc47.firebaseapp.com",
@@ -74,17 +76,17 @@ const firebaseConfig = {
   messagingSenderId: "950563682553",
   appId: "1:950563682553:web:941c5c6b8d0a7a10134a28"
 };
-
+ 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
+ 
 // Oturumu sadece sekme açık olduğu sürece tut — farklı kullanıcılar arası karışma önlenir
 setPersistence(auth, browserSessionPersistence).catch(()=>{});
-
+ 
 const TYT_DATE = new Date("2027-06-19T10:15:00");
 const AYT_DATE = new Date("2027-06-20T10:15:00");
-
+ 
 // ── SUBJECTS ─────────────────────────────────────────────────
 const SUBJECTS = {
   "tyt-mat":  { label:"TYT Matematik",  type:"tyt", xp:10, color:"#6366f1" },
@@ -98,7 +100,7 @@ const SUBJECTS = {
   "ayt-kim":  { label:"AYT Kimya",      type:"ayt", xp:15, color:"#ff6b81" },
   "ayt-bio":  { label:"AYT Biyoloji",   type:"ayt", xp:12, color:"#7bed9f" },
 };
-
+ 
 // ── TOPICS ────────────────────────────────────────────────────
 const TOPICS = {
   // ── TYT MATEMATİK (saf sayı/cebir/analiz konuları) ───────
@@ -114,7 +116,7 @@ const TOPICS = {
     "Veri Analizi & Tablo","İstatistik: Ortalama / Medyan / Mod",
     "Sayma (Temel): Permütasyon & Kombinasyon","Olasılık (Temel)",
   ],
-
+ 
   // ── TYT GEOMETRİ ─────────────────────────────────────────
   "tyt-geo": [
     "Temel Kavramlar: Nokta, Doğru, Düzlem, Açı",
@@ -141,7 +143,7 @@ const TOPICS = {
     "Koordinat Geometrisi: Nokta, Uzaklık, Orta Nokta",
     "Koordinat Geometrisi: Doğru Denklemi",
   ],
-
+ 
   // ── TYT FEN ──────────────────────────────────────────────
   "tyt-fen": [
     "Fizik: Ölçme & Birimler",
@@ -173,7 +175,7 @@ const TOPICS = {
     "Biyoloji: Dolaşım Sistemi",
     "Biyoloji: Sinir Sistemi Temelleri",
   ],
-
+ 
   // ── TYT TÜRKÇE ───────────────────────────────────────────
   "tyt-turk": [
     "Sözcükte Anlam: Gerçek & Mecaz Anlam",
@@ -202,7 +204,7 @@ const TOPICS = {
     "Anlatım: Söz Sanatları",
     "Anlatım: Anlatım Bozuklukları",
   ],
-
+ 
   // ── TYT SOSYAL ───────────────────────────────────────────
   "tyt-sos": [
     "Tarih: İlk Türk Devletleri & Orta Asya",
@@ -230,7 +232,7 @@ const TOPICS = {
     "Vatandaşlık: Anayasa & Devletin Temel Organları",
     "Vatandaşlık: Temel Hak & Özgürlükler",
   ],
-
+ 
   // ── AYT MATEMATİK ────────────────────────────────────────
   "ayt-mat": [
     "İkinci Dereceden Denklemler & Eşitsizlikler",
@@ -266,7 +268,7 @@ const TOPICS = {
     "Matrisler & Determinant",
     "Denklem Sistemleri (Cramer, Matris)",
   ],
-
+ 
   // ── AYT GEOMETRİ ─────────────────────────────────────────
   "ayt-geo": [
     "Üçgenler: Kenar-Açı Eşitsizlikleri & Bağıntıları",
@@ -293,7 +295,7 @@ const TOPICS = {
     "Katı Cisimler: Piramit, Koni, Silindir, Küre",
     "Katı Cisimler: Kesit Problemleri",
   ],
-
+ 
   // ── AYT FİZİK ────────────────────────────────────────────
   "ayt-fiz": [
     "Vektörler & Kuvvet Analizi",
@@ -327,7 +329,7 @@ const TOPICS = {
     "Nükleer Fizik: Radyoaktivite & Yarılanma Ömrü",
     "Nükleer Fizik: Fisyon, Füzyon & Bağlanma Enerjisi",
   ],
-
+ 
   // ── AYT KİMYA ────────────────────────────────────────────
   "ayt-kim": [
     "Atomun Yapısı & Kuantum Mekanik Model",
@@ -361,7 +363,7 @@ const TOPICS = {
     "Polimer & Biyomoleküller (Karbonhidrat, Protein, Yağ)",
     "Nükleer Kimya & Radyoaktiflik",
   ],
-
+ 
   // ── AYT BİYOLOJİ ─────────────────────────────────────────
   "ayt-bio": [
     "Hücre: Yapı, Organeller & Görevleri",
@@ -402,7 +404,7 @@ const TOPICS = {
     "Evrim: Doğal Seleksiyon & Adaptasyon",
   ],
 };
-
+ 
 const LEVELS=[
   {min:0,   name:"Çalışmaya Başladı", next:100},
   {min:100, name:"Azimli Öğrenci",    next:250},
@@ -412,9 +414,9 @@ const LEVELS=[
   {min:1400,name:"Zirve Adayı",       next:2000},
   {min:2000,name:"Efsane Öğrenci",    next:99999},
 ];
-
+ 
 const MOTIVATION = "Vazgeçmediğin sürece kaybetmezsin.";
-
+ 
 // ── STATE ─────────────────────────────────────────────────────
 let currentUser = null;
 let userData = { done:{}, xp:0, streak:[], name:"", studySeconds:{}, exams:[], weeklyGoalHours:8, streakRecord:0 };
@@ -424,14 +426,14 @@ let saveTimeout = null;
 let authMode = "register";
 let isDark = localStorage.getItem("theme")!=="light";
 if(!isDark) document.body.classList.add("light");
-
+ 
 // ── TIMER STATE ───────────────────────────────────────────────
 let timerRunning = false;
 let timerStart = null;
 let timerElapsed = 0; // seconds accumulated before current start
 let timerInterval = null;
 const todayKey = () => new Date().toISOString().slice(0,10); // "YYYY-MM-DD"
-
+ 
 // ── HELPERS ──────────────────────────────────────────────────
 function daysTo(d){ return Math.max(0, Math.ceil((d - Date.now()) / 86400000)); }
 function todayStr(){ return new Date().toDateString(); }
@@ -468,7 +470,7 @@ function fmtTime(sec){
 function todayTotalStudy(){
   return (userData.studySeconds||{})[todayKey()] || 0;
 }
-
+ 
 // ── FIRESTORE ────────────────────────────────────────────────
 async function loadUserData(uid){
   const ref = doc(db,"users",uid);
@@ -484,7 +486,7 @@ async function loadUserData(uid){
   }
   console.log("🔍 userData.name after load:", userData.name);
 }
-
+ 
 function scheduleSave(){
   if(saveTimeout) clearTimeout(saveTimeout);
   // uid'yi şu an yakala, 1.2 saniye sonra farklı kullanıcı olabilir
@@ -495,7 +497,7 @@ function scheduleSave(){
     await setDoc(doc(db,"users",uid), snapshot, {merge:false}); // merge:false → tamamen yeniden yaz
   }, 1200);
 }
-
+ 
 // ── AUTH ──────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user=>{
   currentUser = user;
@@ -519,7 +521,7 @@ onAuthStateChanged(auth, async user=>{
     render();
   }
 });
-
+ 
 // ── CONFETTI ──────────────────────────────────────────────────
 function launchConfetti(){
   const colors=["#6366f1","#14b8a6","#ffd60a","#2ed573","#a855f7","#ff4757"];
@@ -536,7 +538,7 @@ function launchConfetti(){
     },i*25);
   }
 }
-
+ 
 // ── REWARD ────────────────────────────────────────────────────
 function showReward(emoji,title,text,xpAmt){
   const el=document.getElementById("rewardOverlay");
@@ -553,7 +555,7 @@ function closeReward(){
   el.style.opacity="0"; el.style.pointerEvents="none";
   el.querySelector(".rbox").style.transform="scale(0.8)";
 }
-
+ 
 // ── LOADING ───────────────────────────────────────────────────
 function showLoading(msg){
   document.getElementById("root").innerHTML=`
@@ -562,7 +564,7 @@ function showLoading(msg){
       <div style="font-family:monospace;color:#5a6a7e;font-size:0.85rem;letter-spacing:2px;">${msg}</div>
     </div>`;
 }
-
+ 
 // ── TIMER LOGIC ───────────────────────────────────────────────
 function timerCurrentSec(){
   if(timerRunning && timerStart) return timerElapsed + Math.floor((Date.now()-timerStart)/1000);
@@ -619,7 +621,7 @@ function timerReset(){
   timerStart = null;
   timerTick();
 }
-
+ 
 // ── WEEKLY STUDY ─────────────────────────────────────────────
 function weekStudySeconds(){
   const ss = userData.studySeconds||{};
@@ -637,8 +639,8 @@ function updateStreakRecord(){
     userData.streakRecord=cur;
   }
 }
-
-
+ 
+ 
 // ── TOGGLE TOPIC ─────────────────────────────────────────────
 function toggleTopic(subj,i){
   const key=subj+":"+i;
@@ -669,7 +671,7 @@ function toggleTopic(subj,i){
   renderTopics();
   renderStats();
 }
-
+ 
 function setPage(p){
   // stop timer when leaving dashboard? No — keep it running in background
   activePage=p;
@@ -685,7 +687,7 @@ function setSubject(s){
     b.style.fontWeight=b.dataset.s===s?"700":"400";
   });
 }
-
+ 
 // ── AUTH HANDLERS ─────────────────────────────────────────────
 async function doRegister(){
   const nameEl=document.getElementById("authName");
@@ -743,7 +745,7 @@ async function doLogout(){
   if(timerRunning) timerStartStop();
   await signOut(auth);
 }
-
+ 
 // ── RENDER STATS ──────────────────────────────────────────────
 function renderStats(){
   const s=calcStats();
@@ -794,16 +796,16 @@ function buildStreakRow(){
     }
   }
 }
-
+ 
 function elSet(id,val){ const e=document.getElementById(id); if(e) e.textContent=val; }
 function barSet(id,w,clr){ const e=document.getElementById(id); if(e){e.style.width=w+"%";e.style.background=clr;} }
 function pctSet(id,v){ const e=document.getElementById(id); if(e) e.textContent=v+"%"; }
-
+ 
 function renderTopics(searchQuery=""){
   const list=document.getElementById("topicList");
   if(!list) return;
   list.innerHTML="";
-
+ 
   // If searching, show across ALL subjects
   if(searchQuery){
     let found=0;
@@ -839,7 +841,7 @@ function renderTopics(searchQuery=""){
     }
     return;
   }
-
+ 
   // Normal mode — show active subject
   const topics=TOPICS[activeSub]||[];
   const type=SUBJECTS[activeSub].type;
@@ -866,7 +868,7 @@ function renderTopics(searchQuery=""){
     list.appendChild(d);
   });
 }
-
+ 
 // ── NAV ───────────────────────────────────────────────────────
 function navHTML(active){
   return `<header style="display:flex;align-items:center;justify-content:space-between;
@@ -908,7 +910,7 @@ function attachNav(active){
   logoutBtn.addEventListener("click",doLogout);
   nav.appendChild(logoutBtn);
 }
-
+ 
 // ── THEME ─────────────────────────────────────────────────────
 function toggleTheme(){
   isDark=!isDark;
@@ -918,10 +920,10 @@ function toggleTheme(){
   const btn=document.getElementById("themeBtn");
   if(btn) btn.textContent=isDark?"☀️":"🌙";
 }
-
+ 
 const ADMIN_UID = "ayaVV4vRsdcu3lYPabw8otDX4n73";
 function isAdmin(){ return currentUser?.uid === ADMIN_UID; }
-
+ 
 // ── MAIN RENDER ───────────────────────────────────────────────
 function render(){
   if(activePage==="auth")      { renderAuth(); return; }
@@ -931,7 +933,7 @@ function render(){
   if(activePage==="profile")   { renderProfilePage(); return; }
   if(activePage==="admin")     { if(isAdmin()) renderAdminPage(); else setPage("dashboard"); return; }
 }
-
+ 
 function renderAuth(){
   const isLogin = authMode==="login";
   document.getElementById("root").innerHTML=`
@@ -980,7 +982,7 @@ function renderAuth(){
   document.getElementById("authPass").addEventListener("keydown", e=>{ if(e.key==="Enter") isLogin?doLogin():doRegister(); });
   if(isLogin) document.getElementById("forgotBtn").addEventListener("click", doForgotPassword);
 }
-
+ 
 function renderDashboard(){
   const tytDays=daysTo(TYT_DATE), aytDays=daysTo(AYT_DATE);
   const s=calcStats();
@@ -993,11 +995,11 @@ function renderDashboard(){
   const weekGoalSec=(userData.weeklyGoalHours||8)*3600;
   const weekPct=Math.min(100,Math.round(weekSec/weekGoalSec*100));
   const studiedToday=(userData.streak||[]).includes(todayStr());
-
+ 
   document.getElementById("root").innerHTML=`
   <div style="max-width:1280px;margin:0 auto;padding:24px 20px;">
     ${navHTML("dashboard")}
-
+ 
     ${!studiedToday?`
     <!-- Uyarı banner -->
     <div id="noChallengeWarning" style="background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.3);border-radius:10px;
@@ -1008,7 +1010,7 @@ function renderDashboard(){
         <div style="font-size:0.8rem;color:#5a6a7e;margin-top:2px;">Serini kırmamak için en az bir konu tikle veya kronometreyi başlat.</div>
       </div>
     </div>`:""}
-
+ 
     <!-- Geri sayım -->
     <div style="background:#14141f;border:1px solid rgba(255,255,255,0.07);border-radius:16px;
       padding:40px 20px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden;">
@@ -1024,7 +1026,7 @@ function renderDashboard(){
         📅 TYT: 20 Haziran 2026 (${tytDays} gün) &nbsp;|&nbsp; AYT: 21 Haziran 2026 (${aytDays} gün)
       </div>
     </div>
-
+ 
     <!-- İstatistik kartları -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px;">
       ${[
@@ -1038,7 +1040,7 @@ function renderDashboard(){
         <div style="font-family:monospace;font-size:0.62rem;letter-spacing:2px;color:#5a6a7e;">${c.l}</div>
       </div>`).join("")}
     </div>
-
+ 
     <!-- Seviye & ilerleme -->
     <div style="background:#14141f;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
       <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;margin-bottom:16px;font-family:monospace;">SEVİYE & İLERLEME</div>
@@ -1066,7 +1068,7 @@ function renderDashboard(){
         </div>
       </div>`).join("")}
     </div>
-
+ 
     <!-- Haftalık Hedef -->
     <div style="background:#14141f;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
@@ -1093,7 +1095,7 @@ function renderDashboard(){
         Kalan: ${fmtTime(Math.max(0,weekGoalSec-weekSec))} &nbsp;·&nbsp; Bu haftanın son 7 günü sayılır
       </div>
     </div>
-
+ 
     <!-- Seri -->
     <div style="background:#14141f;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
@@ -1108,7 +1110,7 @@ function renderDashboard(){
         💡 Her gün en az bir konu tiklersen serin devam eder.
       </div>
     </div>
-
+ 
     <!-- Çalışma Kronometresi -->
     <div style="background:#14141f;border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:24px;margin-bottom:20px;">
       <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;margin-bottom:16px;font-family:monospace;">
@@ -1135,7 +1137,7 @@ function renderDashboard(){
         </div>
       </div>
     </div>
-
+ 
     <!-- Ders Bazlı İlerleme (Pasta) -->
     <div style="background:#14141f;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:24px;margin-bottom:20px;">
       <div style="font-size:0.72rem;font-weight:700;letter-spacing:3px;color:#5a6a7e;margin-bottom:16px;font-family:monospace;">
@@ -1143,7 +1145,7 @@ function renderDashboard(){
       </div>
       <div id="donutSection" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
     </div>
-
+ 
     <!-- Motivasyon -->
     <div style="background:linear-gradient(135deg,rgba(99,102,241,0.05),rgba(20,184,166,0.05));
       border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:24px;">
@@ -1154,11 +1156,11 @@ function renderDashboard(){
         ${MOTIVATION}</div>
     </div>
   </div>`;
-
+ 
   attachNav("dashboard");
   renderStats();
   renderDonutSection();
-
+ 
   document.getElementById("timerBtn").addEventListener("click", timerStartStop);
   document.getElementById("timerResetBtn").addEventListener("click", timerReset);
   if(timerRunning){
@@ -1168,7 +1170,7 @@ function renderDashboard(){
     if(dot) dot.style.animation="pulse 1s infinite";
   }
   timerTick();
-
+ 
   // Weekly goal input
   document.getElementById("weeklyGoalInput").addEventListener("change", e=>{
     const v=parseInt(e.target.value)||8;
@@ -1177,7 +1179,7 @@ function renderDashboard(){
     renderDashboard();
   });
 }
-
+ 
 function renderTopicsPage(){
   document.getElementById("root").innerHTML=`
   <div style="max-width:1280px;margin:0 auto;padding:24px 20px;">
@@ -1221,7 +1223,7 @@ function renderTopicsPage(){
     renderTopics(e.target.value.trim().toLowerCase());
   });
 }
-
+ 
 // ── EXAMS PAGE ────────────────────────────────────────────────
 function renderExamsPage(){
   document.getElementById("root").innerHTML=`
@@ -1244,11 +1246,11 @@ function renderExamsPage(){
   document.getElementById("addAytBtn").addEventListener("click",()=>showExamForm("ayt"));
   renderExamList();
 }
-
+ 
 let examFormType=null, examEditIdx=null;
-
+ 
 const TYT_EXAM_SUBJECTS=[
-  {key:"tyt-turk",label:"Türkçe",   total:40},
+  {key:"tyt-turk", label:"Türkçe",   total:40},
   {key:"tyt-sos", label:"Sosyal",   total:20},
   {key:"tyt-mat", label:"Matematik",total:40},
   {key:"tyt-fen", label:"Fen",      total:20},
@@ -1265,7 +1267,7 @@ function calcExamTotals(exam){
   const subs=exam.type==="tyt"?TYT_EXAM_SUBJECTS:AYT_EXAM_SUBJECTS;
   let t=0; subs.forEach(s=>{ t+=calcNet(exam.scores?.[s.key]?.d||0, exam.scores?.[s.key]?.y||0); }); return Math.round(t*100)/100;
 }
-
+ 
 function showExamForm(type, editIdx=null){
   examFormType=type; examEditIdx=editIdx;
   const subs=type==="tyt"?TYT_EXAM_SUBJECTS:AYT_EXAM_SUBJECTS;
@@ -1318,7 +1320,7 @@ function showExamForm(type, editIdx=null){
   document.getElementById("examCancelBtn").addEventListener("click",()=>{ form.style.display="none"; examFormType=null; examEditIdx=null; });
   document.getElementById("examSaveBtn").addEventListener("click",saveExam);
 }
-
+ 
 function saveExam(){
   const type=examFormType;
   const subs=type==="tyt"?TYT_EXAM_SUBJECTS:AYT_EXAM_SUBJECTS;
@@ -1332,7 +1334,7 @@ function saveExam(){
   examFormType=null; examEditIdx=null;
   renderExamList();
 }
-
+ 
 function renderExamList(){
   const container=document.getElementById("examList");
   if(!container) return;
@@ -1392,7 +1394,7 @@ function renderExamList(){
   container.querySelectorAll(".editExamBtn").forEach(btn=>btn.addEventListener("click",()=>showExamForm((userData.exams||[])[+btn.dataset.idx].type,+btn.dataset.idx)));
   container.querySelectorAll(".delExamBtn").forEach(btn=>btn.addEventListener("click",()=>{ if(confirm("Bu denemeyi silmek istiyor musun?")){ userData.exams.splice(+btn.dataset.idx,1); scheduleSave(); renderExamList(); } }));
 }
-
+ 
 function drawNetChart(container,tytE,aytE){
   const allNets=[...tytE.map(e=>calcExamTotals(e)),...aytE.map(e=>calcExamTotals(e))];
   const maxNet=Math.max(...allNets,1);
@@ -1401,7 +1403,7 @@ function drawNetChart(container,tytE,aytE){
   const cnt=Math.max(tytE.length,aytE.length,2);
   const W=Math.max(500,cnt*80),H=180,pad={l:36,r:16,t:16,b:32};
   const cW=W-pad.l-pad.r, cH=H-pad.t-pad.b;
-
+ 
   // y position: higher net = higher on screen (lower y value)
   function yPos(net){ return pad.t + cH - ((net-minNet)/range)*cH; }
   function pts(ex){ if(ex.length<2) return null; return ex.map((e,i)=>[ pad.l+(i/(ex.length-1))*cW, yPos(calcExamTotals(e)) ]); }
@@ -1428,7 +1430,7 @@ function drawNetChart(container,tytE,aytE){
     return `<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3,3"/>
       <text x="${(pad.l-4)}" y="${(parseFloat(y)+3).toFixed(1)}" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="9" font-family="monospace">${netVal.toFixed(0)}</text>`;
   }).join("");
-
+ 
   container.innerHTML=`
   <svg width="${W}" height="${H}" style="min-width:${W}px;display:block;">
     ${grid}
@@ -1441,7 +1443,7 @@ function drawNetChart(container,tytE,aytE){
     ${aytE.length>0?`<div style="display:flex;align-items:center;gap:6px;"><div style="width:14px;height:3px;background:#14b8a6;border-radius:2px;"></div><span style="font-family:monospace;font-size:0.65rem;color:#5a6a7e;">AYT</span></div>`:""}
   </div>`;
 }
-
+ 
 // ── DONUT CHART ───────────────────────────────────────────────
 function makeDonut(pct, color, size=72){
   const r=28, cx=size/2, cy=size/2;
@@ -1461,7 +1463,7 @@ function makeDonut(pct, color, size=72){
       fill="${color}" font-size="11" font-family="monospace" font-weight="700">${pct}%</text>
   </svg>`;
 }
-
+ 
 function renderDonutSection(){
   const el=document.getElementById("donutSection");
   if(!el) return;
@@ -1477,7 +1479,7 @@ function renderDonutSection(){
     </div>`;
   }).join("");
 }
-
+ 
 // ── ADMIN PAGE ────────────────────────────────────────────────
 async function renderAdminPage(){
   document.getElementById("root").innerHTML=`
@@ -1492,20 +1494,20 @@ async function renderAdminPage(){
     </div>
   </div>`;
   attachNav("admin");
-
+ 
   try{
     const snap = await getDocs(collection(db,"users"));
     const users = [];
     snap.forEach(d => users.push({uid:d.id, ...d.data()}));
-
+ 
     // Sort by XP desc
     users.sort((a,b)=>(b.xp||0)-(a.xp||0));
-
+ 
     const totalUsers = users.length;
     const totalDone = users.reduce((s,u)=>s+Object.keys(u.done||{}).length,0);
     const activeToday = users.filter(u=>(u.streak||[]).includes(todayStr())).length;
     const avgXP = totalUsers ? Math.round(users.reduce((s,u)=>s+(u.xp||0),0)/totalUsers) : 0;
-
+ 
     const content = document.getElementById("adminContent");
     content.innerHTML=`
       <!-- Özet kartlar -->
@@ -1520,7 +1522,7 @@ async function renderAdminPage(){
           <div style="font-family:monospace;font-size:0.62rem;letter-spacing:2px;color:var(--text2);">${c.l}</div>
         </div>`).join("")}
       </div>
-
+ 
       <!-- Kullanıcı tablosu -->
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
         <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
@@ -1582,7 +1584,7 @@ async function renderAdminPage(){
       </div>`;
   }
 }
-
+ 
 // ── PROFILE PAGE ──────────────────────────────────────────────
 function renderProfilePage(){
   document.getElementById("root").innerHTML=`
@@ -1650,7 +1652,7 @@ function renderProfilePage(){
     </div>
   </div>`;
   attachNav("profile");
-
+ 
   document.getElementById("saveNameBtn").addEventListener("click", async()=>{
     const name=document.getElementById("newName").value.trim();
     const msg=document.getElementById("nameMsg");
@@ -1661,7 +1663,7 @@ function renderProfilePage(){
       msg.style.color="#2ed573"; msg.textContent="✅ İsim güncellendi!";
     } catch(e){ msg.style.color="#ff4757"; msg.textContent="Hata: "+e.message; }
   });
-
+ 
   document.getElementById("savePassBtn").addEventListener("click", async()=>{
     const cur=document.getElementById("currentPass").value;
     const np=document.getElementById("newPass").value;
@@ -1686,9 +1688,9 @@ function renderProfilePage(){
       else msg.textContent="Hata: "+e.message;
     }
   });
-
+ 
   document.getElementById("themeToggleBtn").addEventListener("click",()=>{ toggleTheme(); renderProfilePage(); });
-
+ 
   document.getElementById("resetAllBtn").addEventListener("click",()=>{
     if(!confirm("Tüm ilerleme silinecek. Bunu geri alamazsın. Emin misin?")) return;
     userData.done={}; userData.xp=0; userData.streak=[]; userData.streakRecord=0;
@@ -1697,12 +1699,12 @@ function renderProfilePage(){
     setPage("dashboard");
   });
 }
-
+ 
 // ── REWARD ────────────────────────────────────────────────────
 document.getElementById("rewardBtn").addEventListener("click", closeReward);
 document.getElementById("rewardOverlay").addEventListener("click", closeReward);
 document.querySelector(".rbox").addEventListener("click", e=>e.stopPropagation());
-
+ 
 // ── INIT ──────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded",()=>{
   showLoading("YKSKoç yükleniyor...");
@@ -1710,3 +1712,4 @@ document.addEventListener("DOMContentLoaded",()=>{
 </script>
 </body>
 </html>
+ 

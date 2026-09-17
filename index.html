@@ -4,146 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YKS — Takip Paneli</title>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    :root{
-      --bg:#0a0a12;--bg2:#14141f;--bg3:rgba(255,255,255,0.035);
-      --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
-      --text:#eef0f7;--text2:#5a6a7e;--text3:#b0bec5;
-      --accent:#6366f1;--accent2:#14b8a6;
-      --shadow:0 8px 28px rgba(0,0,0,0.28);
+    * { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --bg: #09090b; --bg2: rgba(24, 24, 27, 0.6); --bg3: rgba(255,255,255,0.03);
+      --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.15);
+      --text: #f8fafc; --text2: #a1a1aa; --text3: #71717a;
+      --accent: #6366f1; --accent-hover: #4f46e5;
+      --accent2: #14b8a6; --success: #2ed573; --danger: #ff4757; --warning: #ffd60a;
+      --shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
-    body.light{
-      --bg:#f5f6fb;--bg2:#ffffff;--bg3:rgba(15,15,35,0.025);
-      --border:rgba(15,15,35,0.08);--border2:rgba(15,15,35,0.13);
-      --text:#171726;--text2:#64748b;--text3:#475569;
-      --shadow:0 8px 28px rgba(20,20,40,0.08);
+    body.light {
+      --bg: #f8fafc; --bg2: rgba(255, 255, 255, 0.7); --bg3: rgba(0,0,0,0.02);
+      --border: rgba(0,0,0,0.08); --border-hover: rgba(0,0,0,0.15);
+      --text: #0f172a; --text2: #64748b; --text3: #94a3b8;
+      --shadow: 0 8px 32px rgba(0,0,0,0.05);
     }
-    body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;min-height:100vh;transition:background 0.3s,color 0.3s;letter-spacing:-0.01em;}
-    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-      background:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(99,102,241,0.07) 0%,transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 90%,rgba(20,184,166,0.06) 0%,transparent 60%);
-    }
-    body.light::before{
-      background:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(99,102,241,0.07) 0%,transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 90%,rgba(20,184,166,0.07) 0%,transparent 60%);
-    }
-    #root{position:relative;z-index:1;}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes cfFall{to{transform:translateY(110vh) rotate(720deg);opacity:0;}}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
-    ::-webkit-scrollbar{width:6px;}
-    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:10px;}
-    body.light ::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.15);}
-    button{font-family:inherit;}
-    input{font-family:inherit;}
-    .input-field { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); outline: none; transition: border-color 0.2s; }
-    .input-field:focus { border-color: var(--accent); }
-    .btn-primary { width: 100%; padding: 14px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-weight: 700; cursor: pointer; transition: opacity 0.2s; margin-bottom: 12px; }
-    .btn-primary:hover { opacity: 0.9; }
-    .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 24px; box-shadow: var(--shadow); }
-    .subTab { padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-    .subTab:hover { border-color: var(--border2); color: var(--text); }
-  </style>
-</head>
-<body>
-<div id="root"></div>
-
-<div id="rewardOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);
-  display:flex;align-items:center;justify-content:center;z-index:1000;
-  opacity:0;pointer-events:none;transition:opacity 0.3s;">
-  <div class="rbox" style="background:#14141f;border:1px solid #ffd60a;
-    border-radius:20px;padding:48px 40px;text-align:center;max-width:400px;width:90%;
-    box-shadow:0 0 60px rgba(255,214,10,0.25);transform:scale(0.8);transition:transform 0.3s;">
-    <div id="rEmoji" style="font-size:3.5rem;margin-bottom:12px;">🎉</div>
-    <div id="rTitle" style="font-size:1.5rem;font-weight:800;color:#ffd60a;margin-bottom:8px;">HARIKA!</div>
-    <div id="rText" style="color:#5a6a7e;font-size:0.95rem;line-height:1.7;margin-bottom:16px;"></div>
-    <div id="rXP" style="font-family:monospace;font-size:1.1rem;color:#2ed573;margin-bottom:20px;"></div>
-    <button id="rewardBtn" onclick="closeReward()" style="background:#ffd60a;border:none;color:#000;
-      padding:12px 32px;border-radius:8px;font-weight:800;cursor:pointer;font-size:0.9rem;">
-      DEVAM ET 💪</button>
-  </div>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, browserSessionPersistence, setPersistence, sendPasswordResetEmail }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBTcsGoXARld4-IQpzst-27bNzzHTJMGbU",
-  authDomain: "ykskoc47.firebaseapp.com",
-  projectId: "ykskoc47",
-  storageBucket: "ykskoc47.firebasestorage.app",
-  messagingSenderId: "9505Gönderdiğiniz YKS Takip Paneli kodu `renderStats` fonksiyonu içindeki `barSet` çağrısında yarım kalmış. Görünüşe göre `#14b8a6` (teal) rengiyle biten bir gradient tanımlanıyordu. 
-
-Uygulamanın sorunsuz çalışabilmesi için eksik kalan DOM manipülasyon (DOM güncelleme) yardımcılarını, `renderTopics` ve ana `render` fonksiyonlarını aşağıda tamamladım. Bu kod parçasını kestiğiniz yerden itibaren ekleyebilirsiniz:
-
-```javascript
-  barSet("xpBar", pct, "linear-gradient(90deg, #ffd60a, #14b8a6)");
-  
-  // TYT - AYT İlerleme Barları
-  elSet("sTytPct", "%" + tytPct);
-  barSet("tytBar", tytPct, "#6366f1");
-  
-  elSet("sAytPct", "%" + aytPct);
-  barSet("aytBar", aytPct, "#14b8a6");
-}
-
-// ── DOM HELPERS ───────────────────────────────────────────────
-function elSet(id, text) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = text;
-}
-
-function barSet(id, pct, background) {
-  const el = document.getElementById(id);
-  if (el) {
-    el.style.width = pct + "%";
-    el.style.background = background;
-  }
-}
-
-// ── RENDER TOPICS ─────────────────────────────────────────────
-function renderTopics() {
-  const container = document.getElementById("topicsContainer");
-  if (!container) return;
-
-  const topics = TOPICS[activeSub] || [];
-  const color = SUBJECTS[activeSub].color;
-
-  container.innerHTML = topics.map((t, i) => {
-    const key = activeSub + ":" + i;
-    const isDone = !!userData.done[key];
+    body { background: var(--bg); color: var(--text); font-family: 'Manrope', sans-serif; min-height: 100vh; transition: all 0.3s ease; letter-spacing: -0.01em; }
     
-    return `
-      <div onclick="toggleTopic('${activeSub}', ${i})" 
-           style="padding:14px; margin-bottom:8px; border-radius:10px; cursor:pointer; 
-                  border:1px solid ${isDone ? color : 'var(--border)'}; 
-                  background:${isDone ? color + '15' : 'var(--bg2)'}; 
-                  display:flex; justify-content:space-between; align-items:center;
-                  transition:all 0.2s;">
-        <span style="color:${isDone ? 'var(--text)' : 'var(--text2)'}; 
-                     text-decoration:${isDone ? 'line-through' : 'none'};
-                     font-weight:${isDone ? '600' : '500'};">${t}</span>
-        <span style="color:${isDone ? color : 'var(--text3)'}; font-size:1.2rem;">
-          ${isDone ? '✅' : '○'}
-        </span>
-      </div>
-    `;
-  }).join("");
-}
+    /* Modern Arka Plan Efekti */
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.12), transparent 40%),
+                  radial-gradient(circle at 85%Hangi siteye girmeye çalışıyordunuz? Bağlantıyı veya sitenin adını paylaşırsanız sorunun ne olabileceğini kontrol edebilirim.
 
-// ── MAIN RENDER ───────────────────────────────────────────────
-window.toggleTopic = toggleTopic; // HTML içinden çağrılabilmesi için
-window.setSubject = setSubject;
-window.timerStartStop = timerStartStop;
-window.timerReset = timerReset;
-window.doLogin = doLogin;
-window.doRegister = doRegister;
-window.doLogout = doLogout;
-window.doForgotPassword = doForgotPassword;
+Siz detayları iletene kadar şu adımları deneyebilirsiniz:
 
-function render() {
-  const root =
+*   **Gizli sekme (Incognito) kullanın:** Tarayıcınızdaki çerezler veya eklentiler sitenin açılmasını engelliyor olabilir. Siteyi gizli sekmede açmayı deneyin.
+*   **Hata koduna bakın:** Ekranda "404 Not Found", "502 Bad Gateway" veya "Bağlantınız gizli değil" gibi spesifik bir hata mesajı varsa bana yazabilirsiniz.
+*   **Farklı bir ağ deneyin:** Sorunun sizin internetinizden mi yoksa doğrudan siteden mi kaynaklandığını anlamak için Wi-Fi yerine hücresel veriye geçiş yapmayı (veya tam tersini) deneyin. 
+*   **Sayfayı zorla yenileyin:** Çoğu tarayıcıda `Ctrl + F5` (Mac'te `Cmd + Shift + R`) tuşlarına basarak önbelleği temizleyip sayfayı yeniden yükleyebilirsiniz.
